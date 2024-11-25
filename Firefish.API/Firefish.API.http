@@ -1,0 +1,6 @@
+@Firefish.API_HostAddress = http://localhost:5191
+
+GET {{Firefish.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
