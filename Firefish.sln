@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Firefish.API", "Firefish.API\Firefish.API.csproj", "{CA507CA7-89ED-43FA-9713-2E7AF162EC8F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Firefish.Core", "Firefish.Core\Firefish.Core.csproj", "{7328CBD1-4919-4539-9FCF-C237A4AC4746}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Firefish.Infrastructure", "Firefish.Infrastructure\Firefish.Infrastructure.csproj", "{B47B43A6-5E66-49C8-8F7A-6DF2AB071B87}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,13 @@ Global
 		{CA507CA7-89ED-43FA-9713-2E7AF162EC8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA507CA7-89ED-43FA-9713-2E7AF162EC8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA507CA7-89ED-43FA-9713-2E7AF162EC8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7328CBD1-4919-4539-9FCF-C237A4AC4746}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7328CBD1-4919-4539-9FCF-C237A4AC4746}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7328CBD1-4919-4539-9FCF-C237A4AC4746}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7328CBD1-4919-4539-9FCF-C237A4AC4746}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B47B43A6-5E66-49C8-8F7A-6DF2AB071B87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B47B43A6-5E66-49C8-8F7A-6DF2AB071B87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B47B43A6-5E66-49C8-8F7A-6DF2AB071B87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B47B43A6-5E66-49C8-8F7A-6DF2AB071B87}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
