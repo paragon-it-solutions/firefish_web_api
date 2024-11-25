@@ -10,7 +10,12 @@ builder.Services.AddEndpointsApiExplorer();
 // CORS configuration
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAnyOrigin", b => b.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+    options.AddPolicy(
+        "AllowAnyOrigin",
+        b => b.AllowAnyOrigin()
+                                        .AllowAnyMethod()
+                                        .AllowAnyHeader()
+        );
 });
 
 WebApplication app = builder.Build();
