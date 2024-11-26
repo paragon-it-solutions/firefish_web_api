@@ -4,8 +4,8 @@ namespace Firefish.Core.Contracts.Repositories;
 
 public interface ICandidateRepository
 {
-    Task<Candidate?> GetCandidateById(int candidateId);
     Task<List<Candidate>> GetAllCandidates();
+    Task<Candidate?> GetCandidateById(int candidateId);
     Task<Candidate> CreateCandidate(Candidate candidate);
     Task UpdateExistingCandidate(Candidate candidate);
 }
