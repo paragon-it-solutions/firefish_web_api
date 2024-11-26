@@ -52,7 +52,8 @@ public class CandidatesController(ICandidateService candidateService) : Controll
     {
         try
         {
-            CandidateDetailsResponseModel responseModel = await candidateService.GetCandidateByIdAsync(id);
+            CandidateDetailsResponseModel responseModel =
+                await candidateService.GetCandidateByIdAsync(id);
             return Ok(responseModel);
         }
         catch (KeyNotFoundException ex)
@@ -86,11 +87,13 @@ public class CandidatesController(ICandidateService candidateService) : Controll
     /// <response code="500">If there was an internal server error during candidate creation</response>
     [HttpPost]
     public async Task<ActionResult<CandidateDetailsResponseModel>> Post(
-        [FromBody] CandidateModifyRequestModel requestModel)
+        [FromBody] CandidateModifyRequestModel requestModel
+    )
     {
         try
         {
-            CandidateDetailsResponseModel responseModel = await candidateService.CreateCandidateAsync(requestModel);
+            CandidateDetailsResponseModel responseModel =
+                await candidateService.CreateCandidateAsync(requestModel);
             return CreatedAtAction(nameof(Get), new { id = responseModel.Id }, responseModel);
         }
         catch (ArgumentNullException ex)
@@ -125,8 +128,10 @@ public class CandidatesController(ICandidateService candidateService) : Controll
     /// <response code="404">If the candidate with the specified ID is not found</response>
     /// <response code="500">If there was an internal server error during candidate update</response>
     [HttpPut("{id:int}")]
-    public async Task<ActionResult<CandidateDetailsResponseModel>> Put(int id,
-        [FromBody] CandidateModifyRequestModel requestModel)
+    public async Task<ActionResult<CandidateDetailsResponseModel>> Put(
+        int id,
+        [FromBody] CandidateModifyRequestModel requestModel
+    )
     {
         try
         {
