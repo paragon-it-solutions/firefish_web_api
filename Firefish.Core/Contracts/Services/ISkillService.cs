@@ -12,7 +12,5 @@ public interface ISkillService
     Task<IEnumerable<SkillResponseModel>> AddSkillByCandidateIdAsync(
         CandidateSkillRequestModel candidateSkill
     );
-    Task<IEnumerable<SkillResponseModel>> RemoveSkillByCandidateIdAsync(
-        CandidateSkillRequestModel candidateSkill
-    );
+    Task<IEnumerable<SkillResponseModel>> RemoveSkillByIdAsync(int candidateSkillId);
 }
