@@ -16,7 +16,7 @@ public static class CandidateFieldNames
     public const string FirstName = nameof(Candidate.FirstName);
     public const string Surname = nameof(Candidate.Surname);
     public const string DateOfBirth = nameof(Candidate.DateOfBirth);
-    public const string Address = nameof(Candidate.Address);
+    public const string Address = nameof(Candidate.Address) + "1";
     public const string Town = nameof(Candidate.Town);
     public const string Country = nameof(Candidate.Country);
     public const string PostCode = nameof(Candidate.PostCode);
