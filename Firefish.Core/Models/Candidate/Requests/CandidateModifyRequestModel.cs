@@ -1,6 +1,6 @@
 ﻿namespace Firefish.Core.Models.Candidate.Requests;
 
-public class CandidateCreateOrUpdateRequestModel
+public class CandidateModifyRequestModel
 {
     public string? FirstName { get; set; }
     public string? Surname { get; set; }
