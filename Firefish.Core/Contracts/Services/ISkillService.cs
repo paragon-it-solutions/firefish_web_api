@@ -9,6 +9,10 @@ namespace Firefish.Core.Contracts.Services;
 public interface ISkillService
 {
     Task<IEnumerable<SkillResponseModel>> GetSkillsByCandidateIdAsync(int candidateId);
-    Task<IEnumerable<SkillResponseModel>> AddSkillByCandidateIdAsync(SkillRequestModel skill);
-    Task<IEnumerable<SkillResponseModel>> RemoveSkillByCandidateIdAsync(SkillRequestModel skill);
+    Task<IEnumerable<SkillResponseModel>> AddSkillByCandidateIdAsync(
+        CandidateSkillRequestModel candidateSkill
+    );
+    Task<IEnumerable<SkillResponseModel>> RemoveSkillByCandidateIdAsync(
+        CandidateSkillRequestModel candidateSkill
+    );
 }
