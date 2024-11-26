@@ -27,53 +27,55 @@ public class SkillService(ISkillRepository skillRepository) : ISkillService
     }
 
     /// <summary>
-    /// Adds a skill to a candidate's profile.
+    /// Adds a candidateSkill to a candidate's profile.
     /// </summary>
-    /// <param name="skill">The SkillRequestModel containing the candidate ID and skill ID.</param>
+    /// <param name="candidateSkill">The CandidateSkillRequestModel containing the candidate ID and candidateSkill ID.</param>
     /// <returns>An updated collection of SkillResponseModel representing the skills associated with the candidate.</returns>
     public async Task<IEnumerable<SkillResponseModel>> AddSkillByCandidateIdAsync(
-        SkillRequestModel skill
+        CandidateSkillRequestModel candidateSkill
     )
     {
         try
         {
-            if (!await skillRepository.SkillExistsAsync(skill.SkillId))
+            if (!await skillRepository.SkillExistsAsync(candidateSkill.SkillId))
             {
-                throw new ArgumentException($"Skill with ID {skill.SkillId} does not exist.");
+                throw new ArgumentException(
+                    $"Skill with ID {candidateSkill.SkillId} does not exist."
+                );
             }
 
             var updatedSkills = await skillRepository.AddSkillByCandidateIdAsync(
-                skill.CandidateId,
-                skill.SkillId
+                candidateSkill.CandidateId,
+                candidateSkill.SkillId
             );
             return updatedSkills.Select(SkillMapper.MapToSkillResponseModel).ToList();
         }
         catch (Exception ex)
         {
-            throw new Exception($"Error adding skill to candidate: {ex.Message}", ex);
+            throw new Exception($"Error adding candidateSkill to candidate: {ex.Message}", ex);
         }
     }
 
     /// <summary>
-    /// Removes a skill from a candidate's profile.
+    /// Removes a candidateSkill from a candidate's profile.
     /// </summary>
-    /// <param name="skill">The SkillRequestModel containing the candidate ID and skill ID.</param>
+    /// <param name="candidateSkill">The CandidateSkillRequestModel containing the candidate ID and candidateSkill ID.</param>
     /// <returns>An updated collection of SkillResponseModel representing the remaining skills associated with the candidate.</returns>
     public async Task<IEnumerable<SkillResponseModel>> RemoveSkillByCandidateIdAsync(
-        SkillRequestModel skill
+        CandidateSkillRequestModel candidateSkill
     )
     {
         try
         {
             var updatedSkills = await skillRepository.RemoveSkillByCandidateIdAsync(
-                skill.CandidateId,
-                skill.SkillId
+                candidateSkill.CandidateId,
+                candidateSkill.SkillId
             );
             return updatedSkills.Select(SkillMapper.MapToSkillResponseModel);
         }
         catch (Exception ex)
         {
-            throw new Exception($"Error removing skill from candidate: {ex.Message}", ex);
+            throw new Exception($"Error removing candidateSkill from candidate: {ex.Message}", ex);
         }
     }
 }
