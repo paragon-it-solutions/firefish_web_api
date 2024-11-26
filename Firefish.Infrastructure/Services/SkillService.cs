@@ -27,17 +27,28 @@ public class SkillService(ISkillRepository skillRepository) : ISkillService
     }
 
     /// <summary>
-    /// Adds a candidateSkill to a candidate's profile.
+    /// Adds a skill to a candidate's profile.
     /// </summary>
-    /// <param name="candidateSkill">The CandidateSkillRequestModel containing the candidate ID and candidateSkill ID.</param>
-    /// <returns>An updated collection of SkillResponseModel representing the skills associated with the candidate.</returns>
+    /// <param name="candidateSkill">
+    /// A <see cref="CandidateSkillRequestModel"/> containing the candidate ID and skill ID to be added.
+    /// </param>
+    /// <returns>
+    /// A collection of <see cref="SkillResponseModel"/> representing the updated list of skills
+    /// associated with the candidate after the new skill has been added.
+    /// </returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the specified skill does not exist in the system.
+    /// </exception>
+    /// <exception cref="Exception">
+    /// Thrown when an error occurs during the process of adding the skill to the candidate.
+    /// </exception>
     public async Task<IEnumerable<SkillResponseModel>> AddSkillByCandidateIdAsync(
         CandidateSkillRequestModel candidateSkill
     )
     {
         try
         {
-            if (!await skillRepository.SkillExistsAsync(candidateSkill.SkillId))
+            if (!await skillRepository.CandidateSkillExists(candidateSkill.SkillId))
             {
                 throw new ArgumentException(
                     $"Skill with ID {candidateSkill.SkillId} does not exist."
@@ -57,10 +68,14 @@ public class SkillService(ISkillRepository skillRepository) : ISkillService
     }
 
     /// <summary>
-    /// Removes a candidateSkill from a candidate's profile.
+    /// Removes a skill from a candidate's profile by the candidate skill ID.
     /// </summary>
-    /// <param name="candidateSkill">The CandidateSkillRequestModel containing the candidate ID and candidateSkill ID.</param>
-    /// <returns>An updated collection of SkillResponseModel representing the remaining skills associated with the candidate.</returns>
+    /// <param name="candidateSkillId">The unique identifier of the candidate skill to be removed.</param>
+    /// <returns>
+    /// A collection of <see cref="SkillResponseModel"/> representing the remaining skills
+    /// associated with the candidate after removal.
+    /// </returns>
+    /// <exception cref="Exception">Thrown when an error occurs during the skill removal process.</exception>
     public async Task<IEnumerable<SkillResponseModel>> RemoveSkillByIdAsync(int candidateSkillId)
     {
         try
