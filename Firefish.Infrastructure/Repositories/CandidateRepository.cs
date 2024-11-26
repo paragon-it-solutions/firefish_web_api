@@ -23,7 +23,7 @@ public class CandidateRepository : ICandidateRepository
     ///     This method establishes a database connection, executes a SELECT query to retrieve all candidates,
     ///     and constructs a List of Candidate objects from the retrieved data. It handles null values for optional fields.
     /// </remarks>
-    public async Task<List<Candidate>> GetAllCandidates()
+    public async Task<List<Candidate>> GetAllCandidatesAsync()
     {
         var candidates = new List<Candidate>();
 
@@ -96,7 +96,7 @@ public class CandidateRepository : ICandidateRepository
     ///     This method establishes a database connection, executes a SELECT query with the provided candidateId,
     ///     and constructs a Candidate object from the retrieved data. It handles null values for optional fields.
     /// </remarks>
-    public async Task<Candidate?> GetCandidateById(int candidateId)
+    public async Task<Candidate?> GetCandidateByIdAsync(int candidateId)
     {
         await using var connection = new SqlConnection(SqlConnectionHelper.ConnectionString);
         connection.Open();
@@ -155,7 +155,7 @@ public class CandidateRepository : ICandidateRepository
         return null;
     }
 
-    public async Task<Candidate> CreateCandidate(Candidate candidate)
+    public async Task<Candidate> CreateCandidateAsync(Candidate candidate)
     {
         await using var connection = new SqlConnection(SqlConnectionHelper.ConnectionString);
         connection.Open();
@@ -196,6 +196,7 @@ public class CandidateRepository : ICandidateRepository
         
         command.Parameters.AddWithValue($"@{CandidateFieldNames.CreatedDate}", DateTime.Now);
         ParameteriseValuesForCommand(command, candidate);
+        ParameteriseValuesForCommand(command, candidate);
 
         // Sets ID to db identity column
         candidate.Id = (int)await command.ExecuteScalarAsync();
@@ -214,7 +215,7 @@ public class CandidateRepository : ICandidateRepository
     ///     This method opens a new SQL connection, constructs an UPDATE query using the provided candidate's information,
     ///     and executes it against the database. The UpdatedDate is automatically set to the current date and time.
     /// </remarks>
-    public async Task UpdateExistingCandidate(Candidate candidate)
+    public async Task UpdateExistingCandidateAsync(Candidate candidate)
     {
         await using var connection = new SqlConnection(SqlConnectionHelper.ConnectionString);
         connection.Open();
