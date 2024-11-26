@@ -61,16 +61,11 @@ public class SkillService(ISkillRepository skillRepository) : ISkillService
     /// </summary>
     /// <param name="candidateSkill">The CandidateSkillRequestModel containing the candidate ID and candidateSkill ID.</param>
     /// <returns>An updated collection of SkillResponseModel representing the remaining skills associated with the candidate.</returns>
-    public async Task<IEnumerable<SkillResponseModel>> RemoveSkillByCandidateIdAsync(
-        CandidateSkillRequestModel candidateSkill
-    )
+    public async Task<IEnumerable<SkillResponseModel>> RemoveSkillByIdAsync(int candidateSkillId)
     {
         try
         {
-            var updatedSkills = await skillRepository.RemoveSkillByCandidateIdAsync(
-                candidateSkill.CandidateId,
-                candidateSkill.SkillId
-            );
+            var updatedSkills = await skillRepository.RemoveSkillByIdAsync(candidateSkillId);
             return updatedSkills.Select(SkillMapper.MapToSkillResponseModel);
         }
         catch (Exception ex)
