@@ -7,6 +7,11 @@ public interface ICandidateService
 {
     Task<IEnumerable<CandidateListItemResponseModel>> GetAllCandidatesAsync();
     Task<CandidateDetailsResponseModel> GetCandidateByIdAsync(int candidateId);
-    Task<CandidateDetailsResponseModel> CreateCandidateAsync(CandidateModifyRequestModel candidate);
-    Task<CandidateDetailsResponseModel> UpdateExistingCandidateAsync(int id, CandidateModifyRequestModel candidate);
+    Task<CandidateDetailsResponseModel> CreateCandidateAsync(
+        CandidateModifyRequestModel candidateModel
+    );
+    Task<CandidateDetailsResponseModel> UpdateExistingCandidateAsync(
+        int candidateId,
+        CandidateModifyRequestModel candidateModel
+    );
 }
