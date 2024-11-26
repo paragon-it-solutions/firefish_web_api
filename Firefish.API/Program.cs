@@ -1,14 +1,10 @@
 using Firefish.Core.Contracts.Repositories;
 using Firefish.Core.Contracts.Services;
-using Firefish.Core.Entities;
 using Firefish.Infrastructure.Repositories;
 using Firefish.Infrastructure.Services;
+using Microsoft.OpenApi.Models;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
 
 // Configure controllers and endpoint routing.
 builder.Services.AddControllers();
@@ -23,20 +19,22 @@ builder.Services.AddScoped<ICandidateService, CandidateService>();
 // CORS configuration
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(
-        "AllowAnyOrigin",
-        b => b.AllowAnyOrigin()
-                                        .AllowAnyMethod()
-                                        .AllowAnyHeader()
-        );
+    options.AddPolicy("AllowAnyOrigin", b => b.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+});
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Firefish API Task", Version = "v1" });
 });
 
 WebApplication app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseDeveloperExceptionPage();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
