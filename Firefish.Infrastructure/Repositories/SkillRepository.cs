@@ -5,6 +5,9 @@ using Microsoft.Data.SqlClient;
 
 namespace Firefish.Infrastructure.Repositories;
 
+/// <summary>
+///     Repository class for managing skills and candidate-skill associations.
+/// </summary>
 public class SkillRepository : ISkillRepository
 {
     private const string SkillTableName = nameof(Skill);
@@ -15,6 +18,7 @@ public class SkillRepository : ISkillRepository
     /// </summary>
     /// <param name="candidateId">The ID of the candidate.</param>
     /// <returns>A collection of skills associated with the candidate.</returns>
+    /// <exception cref="Exception">Thrown when an error occurs while retrieving skills.</exception>
     public async Task<IEnumerable<CandidateSkill>> GetSkillsByCandidateIdAsync(int candidateId)
     {
         var skills = new List<CandidateSkill>();
@@ -32,7 +36,10 @@ public class SkillRepository : ISkillRepository
                 """;
 
             await using var command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@CandidateId", candidateId);
+            command.Parameters.AddWithValue(
+                $"@{CandidateSkillFieldNames.CandidateId}",
+                candidateId
+            );
 
             await using SqlDataReader? reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
@@ -66,6 +73,8 @@ public class SkillRepository : ISkillRepository
     /// <param name="candidateId">The ID of the candidate.</param>
     /// <param name="skillId">The ID of the skill to add.</param>
     /// <returns>The updated collection of skills for the candidate.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when the skill already exists for the candidate.</exception>
+    /// <exception cref="Exception">Thrown when an error occurs while adding the skill.</exception>
     public async Task<IEnumerable<CandidateSkill>> AddSkillByCandidateIdAsync(
         int candidateId,
         int skillId
@@ -84,16 +93,31 @@ public class SkillRepository : ISkillRepository
             await connection.OpenAsync();
 
             const string query = $"""
-                                INSERT INTO {CandidateSkillTableName} ({CandidateSkillFieldNames.CandidateId}, {CandidateSkillFieldNames.SkillId})
-                                VALUES (@{CandidateSkillFieldNames.CandidateId}, @{CandidateSkillFieldNames.SkillId})
+                                INSERT INTO {CandidateSkillTableName} ({CandidateSkillFieldNames.Id}, {CandidateSkillFieldNames.CandidateId}, 
+                                {CandidateSkillFieldNames.CreatedDate}, {CandidateSkillFieldNames.UpdatedDate}, {CandidateSkillFieldNames.SkillId})
+                                VALUES (@{CandidateSkillFieldNames.Id}, @{CandidateSkillFieldNames.CandidateId}, 
+                                @{CandidateSkillFieldNames.CreatedDate}, @{CandidateSkillFieldNames.UpdatedDate}, @{CandidateSkillFieldNames.SkillId})
                 """;
 
             await using var command = new SqlCommand(query, connection);
 
+            int candidateSkillId = await SqlIdentityHelper.GenerateIdentityAsync(
+                CandidateSkillTableName
+            );
+            command.Parameters.AddWithValue($"@{CandidateSkillFieldNames.Id}", candidateSkillId);
             command.Parameters.AddWithValue(
                 $"@{CandidateSkillFieldNames.CandidateId}",
                 candidateId
             );
+            command.Parameters.AddWithValue(
+                $"@{CandidateSkillFieldNames.CreatedDate}",
+                DateTime.Now
+            );
+            command.Parameters.AddWithValue(
+                $"@{CandidateSkillFieldNames.UpdatedDate}",
+                DateTime.Now
+            );
+
             command.Parameters.AddWithValue($"@{CandidateSkillFieldNames.SkillId}", skillId);
 
             await command.ExecuteNonQueryAsync();
@@ -109,35 +133,32 @@ public class SkillRepository : ISkillRepository
     /// <summary>
     ///     Removes a skill from a candidate's profile.
     /// </summary>
-    /// <param name="candidateId">The ID of the candidate.</param>
-    /// <param name="skillId">The ID of the skill to remove.</param>
+    /// <param name="candidateSkillId">The ID of the candidate-skill association to remove.</param>
     /// <returns>The updated collection of skills for the candidate.</returns>
-    public async Task<IEnumerable<CandidateSkill>> RemoveSkillByCandidateIdAsync(
-        int candidateId,
-        int skillId
-    )
+    /// <exception cref="Exception">Thrown when an error occurs while removing the skill.</exception>
+    public async Task<IEnumerable<CandidateSkill>> RemoveSkillByIdAsync(int candidateSkillId)
     {
         try
         {
             await using var connection = new SqlConnection(SqlConnectionHelper.ConnectionString);
             await connection.OpenAsync();
 
+            // Query deletes record but also outputs the deleted candidate ID for use in getting updated skills list
             const string query = $"""
+                DECLARE @DeletedCandidateId TABLE (CandidateId INT);
 
-                                DELETE FROM {CandidateSkillTableName}
-                                WHERE {CandidateSkillFieldNames.CandidateId} = @{CandidateSkillFieldNames.CandidateId}
-                                AND {CandidateSkillFieldNames.SkillId} = @{CandidateSkillFieldNames.SkillId}
+                DELETE FROM {CandidateSkillTableName}
+                OUTPUT DELETED.{CandidateSkillFieldNames.CandidateId} INTO @DeletedCandidateId
+                WHERE {CandidateSkillFieldNames.Id} = @{CandidateSkillFieldNames.Id};
+
+                SELECT CandidateId FROM @DeletedCandidateId;
                 """;
 
             await using var command = new SqlCommand(query, connection);
 
-            command.Parameters.AddWithValue(
-                $"@{CandidateSkillFieldNames.CandidateId}",
-                candidateId
-            );
-            command.Parameters.AddWithValue($"@{CandidateSkillFieldNames.SkillId}", skillId);
+            command.Parameters.AddWithValue($"@{CandidateSkillFieldNames.Id}", candidateSkillId);
 
-            await command.ExecuteNonQueryAsync();
+            int candidateId = (int)await command.ExecuteScalarAsync();
 
             return await GetSkillsByCandidateIdAsync(candidateId);
         }
@@ -152,6 +173,7 @@ public class SkillRepository : ISkillRepository
     /// </summary>
     /// <param name="skillId">The ID of the skill to check.</param>
     /// <returns>True if the skill exists, false otherwise.</returns>
+    /// <exception cref="Exception">Thrown when an error occurs while checking skill existence.</exception>
     public async Task<bool> SkillExistsAsync(int skillId)
     {
         try
@@ -177,11 +199,12 @@ public class SkillRepository : ISkillRepository
     }
 
     /// <summary>
-    ///     Checks if a skill with the given ID exists in the database.
+    ///     Checks if a skill with the given ID exists for a specific candidate.
     /// </summary>
     /// <param name="skillId">The ID of the skill to check.</param>
     /// <param name="candidateId">The ID of the candidate to check.</param>
-    /// <returns>True if the skill exists for candidate, false otherwise.</returns>
+    /// <returns>True if the skill exists for the candidate, false otherwise.</returns>
+    /// <exception cref="Exception">Thrown when an error occurs while checking skill existence for the candidate.</exception>
     public async Task<bool> SkillExistsForCandidateAsync(int skillId, int candidateId)
     {
         try
@@ -190,7 +213,6 @@ public class SkillRepository : ISkillRepository
             await connection.OpenAsync();
 
             const string query = $"""
-
                                 SELECT COUNT(1) FROM {CandidateSkillTableName}
                                 WHERE {CandidateSkillFieldNames.SkillId} = @{CandidateSkillFieldNames.SkillId}
                                 AND {CandidateSkillFieldNames.CandidateId} = @{CandidateSkillFieldNames.CandidateId}
