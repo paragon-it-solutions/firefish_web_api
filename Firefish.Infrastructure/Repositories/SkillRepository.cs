@@ -15,9 +15,9 @@ public class SkillRepository : ISkillRepository
     /// </summary>
     /// <param name="candidateId">The ID of the candidate.</param>
     /// <returns>A collection of skills associated with the candidate.</returns>
-    public async Task<IEnumerable<Skill>> GetSkillsByCandidateIdAsync(int candidateId)
+    public async Task<IEnumerable<CandidateSkill>> GetSkillsByCandidateIdAsync(int candidateId)
     {
-        var skills = new List<Skill>();
+        var skills = new List<CandidateSkill>();
 
         try
         {
@@ -25,7 +25,7 @@ public class SkillRepository : ISkillRepository
             await connection.OpenAsync();
 
             const string query = $"""
-                                SELECT {SkillTableName}.{CandidateSkillFieldNames.Id}, {CandidateSkillFieldNames.SkillName}
+                                SELECT {CandidateSkillTableName}.{CandidateSkillFieldNames.Id}, {SkillTableName}.{CandidateSkillFieldNames.Id}, {CandidateSkillFieldNames.SkillName}
                                 FROM {SkillTableName}
                                 INNER JOIN {CandidateSkillTableName} ON {SkillTableName}.{CandidateSkillFieldNames.Id} = {CandidateSkillTableName}.{CandidateSkillFieldNames.SkillId}
                                 WHERE {CandidateSkillTableName}.{CandidateSkillFieldNames.CandidateId} = @{CandidateSkillFieldNames.CandidateId}
@@ -38,10 +38,14 @@ public class SkillRepository : ISkillRepository
             while (await reader.ReadAsync())
             {
                 skills.Add(
-                    new Skill
+                    new CandidateSkill
                     {
                         Id = reader.GetInt32(reader.GetOrdinal(CandidateSkillFieldNames.Id)),
-                        Name = reader.GetString(
+                        CandidateId = candidateId,
+                        SkillId = reader.GetInt32(
+                            reader.GetOrdinal(CandidateSkillFieldNames.SkillId)
+                        ),
+                        SkillName = reader.GetString(
                             reader.GetOrdinal(CandidateSkillFieldNames.SkillName)
                         ),
                     }
@@ -62,7 +66,10 @@ public class SkillRepository : ISkillRepository
     /// <param name="candidateId">The ID of the candidate.</param>
     /// <param name="skillId">The ID of the skill to add.</param>
     /// <returns>The updated collection of skills for the candidate.</returns>
-    public async Task<IEnumerable<Skill>> AddSkillByCandidateIdAsync(int candidateId, int skillId)
+    public async Task<IEnumerable<CandidateSkill>> AddSkillByCandidateIdAsync(
+        int candidateId,
+        int skillId
+    )
     {
         if (await SkillExistsForCandidateAsync(candidateId, skillId))
         {
@@ -70,6 +77,7 @@ public class SkillRepository : ISkillRepository
                 $"Skill with ID {skillId} already exists for candidate with ID {candidateId}"
             );
         }
+
         try
         {
             await using var connection = new SqlConnection(SqlConnectionHelper.ConnectionString);
@@ -104,7 +112,7 @@ public class SkillRepository : ISkillRepository
     /// <param name="candidateId">The ID of the candidate.</param>
     /// <param name="skillId">The ID of the skill to remove.</param>
     /// <returns>The updated collection of skills for the candidate.</returns>
-    public async Task<IEnumerable<Skill>> RemoveSkillByCandidateIdAsync(
+    public async Task<IEnumerable<CandidateSkill>> RemoveSkillByCandidateIdAsync(
         int candidateId,
         int skillId
     )

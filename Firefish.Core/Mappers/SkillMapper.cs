@@ -17,7 +17,8 @@ public static class SkillMapper
     {
         return new SkillResponseModel
         {
-            Id = candidateSkill.SkillId,
+            CandidateSkillId = candidateSkill.Id,
+            SkillId = candidateSkill.SkillId,
             Name = candidateSkill.SkillName,
         };
     }
@@ -25,10 +26,10 @@ public static class SkillMapper
     /// <summary>
     ///     Maps a Skill entity to a SkillResponseModel.
     /// </summary>
-    /// <param name="skill">The CandidateSkill entity to map from.</param>
+    /// <param name="skill">The SKill entity to map from.</param>
     /// <returns>A new SkillResponseModel.</returns>
     public static SkillResponseModel MapToSkillResponseModel(Skill skill)
     {
-        return new SkillResponseModel { Id = skill.Id, Name = skill.Name! };
+        return new SkillResponseModel { SkillId = skill.Id, Name = skill.Name! };
     }
 }
