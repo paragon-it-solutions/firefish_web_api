@@ -12,8 +12,8 @@ public class CandidateSkill
 {
     public int Id { get; set; }
     public required int CandidateId { get; set; }
-    public required DateTime CreatedDate { get; set; }
-    public required DateTime UpdatedDate { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public DateTime UpdatedDate { get; set; }
     public required int SkillId { get; set; }
 
     // SkillName is not a live field on DB - it is determined by the join between CandidateSkill and Skill tables.
