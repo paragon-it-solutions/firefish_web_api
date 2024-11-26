@@ -8,8 +8,12 @@ namespace Firefish.Infrastructure.Repositories;
 public class CandidateRepository : ICandidateRepository
 {
     // Base query for retrieving all candidates from the database - can be modified to include additional filters or sorting as needed.
-    private const string AllCandidateBaseQuery =
-        "SELECT [ID], [FirstName], [Surname], [DateOfBirth], [Address1], [Town], [Country], [PostCode], [PhoneHome], [PhoneMobile], [PhoneWork], [CreatedDate], [UpdatedDate] FROM [Candidate]";
+    private const string AllCandidateBaseQuery = $"""
+        SELECT [{CandidateFieldNames.Id}], [{CandidateFieldNames.FirstName}], [{CandidateFieldNames.Surname}], [{CandidateFieldNames.DateOfBirth}],
+        [{CandidateFieldNames.Address}], [{CandidateFieldNames.Town}], [{CandidateFieldNames.Country}], [{CandidateFieldNames.PostCode}], 
+        [{CandidateFieldNames.PhoneHome}], [{CandidateFieldNames.PhoneMobile}], [{CandidateFieldNames.PhoneWork}], [{CandidateFieldNames.CreatedDate}],
+        [{CandidateFieldNames.UpdatedDate}] FROM [Candidate];
+        """;
 
     /// <summary>
     ///     Retrieves all candidates from the database.
@@ -202,52 +206,50 @@ public class CandidateRepository : ICandidateRepository
             await using var connection = new SqlConnection(SqlConnectionHelper.ConnectionString);
             connection.Open();
 
-            // "SELECT SCOPE_IDENTITY()" returns the identity value of the inserted row.
             await using var command = new SqlCommand(
-                """
-                            INSERT INTO [Candidate] 
-                            ([{CandidateFieldNames.FirstName}], 
-                             [{CandidateFieldNames.Surname}], 
-                             [{CandidateFieldNames.DateOfBirth}], 
-                             [{CandidateFieldNames.Address}], 
-                             [{CandidateFieldNames.Town}], 
-                             [{CandidateFieldNames.Country}], 
-                             [{CandidateFieldNames.PostCode}], 
-                             [{CandidateFieldNames.PhoneHome}], 
-                             [{CandidateFieldNames.PhoneMobile}], 
-                             [{CandidateFieldNames.PhoneWork}], 
-                             [{CandidateFieldNames.CreatedDate}],
-                             [{CandidateFieldNames.UpdatedDate}])
-                            VALUES
-                            (@{CandidateFieldNames.FirstName}, 
-                             @{CandidateFieldNames.Surname}, 
-                             @{CandidateFieldNames.DateOfBirth}, 
-                             @{CandidateFieldNames.Address}, 
-                             @{CandidateFieldNames.Town}, 
-                             @{CandidateFieldNames.Country}, 
-                             @{CandidateFieldNames.PostCode}, 
-                             @{CandidateFieldNames.PhoneHome}, 
-                             @{CandidateFieldNames.PhoneMobile}, 
-                             @{CandidateFieldNames.PhoneWork}, 
-                             @{CandidateFieldNames.CreatedDate},
-                             @{CandidateFieldNames.UpdatedDate});
-                            SELECT CAST(SCOPE_IDENTITY() AS INT);
+                $"""
+                INSERT INTO [Candidate] 
+                ([{CandidateFieldNames.Id}],
+                 [{CandidateFieldNames.FirstName}], 
+                 [{CandidateFieldNames.Surname}], 
+                 [{CandidateFieldNames.DateOfBirth}], 
+                 [{CandidateFieldNames.Address}], 
+                 [{CandidateFieldNames.Town}], 
+                 [{CandidateFieldNames.Country}], 
+                 [{CandidateFieldNames.PostCode}], 
+                 [{CandidateFieldNames.PhoneHome}], 
+                 [{CandidateFieldNames.PhoneMobile}], 
+                 [{CandidateFieldNames.PhoneWork}], 
+                 [{CandidateFieldNames.CreatedDate}],
+                 [{CandidateFieldNames.UpdatedDate}])
+                VALUES
+                (@{CandidateFieldNames.Id},
+                 @{CandidateFieldNames.FirstName}, 
+                 @{CandidateFieldNames.Surname}, 
+                 @{CandidateFieldNames.DateOfBirth}, 
+                 @{CandidateFieldNames.Address}, 
+                 @{CandidateFieldNames.Town}, 
+                 @{CandidateFieldNames.Country}, 
+                 @{CandidateFieldNames.PostCode}, 
+                 @{CandidateFieldNames.PhoneHome}, 
+                 @{CandidateFieldNames.PhoneMobile}, 
+                 @{CandidateFieldNames.PhoneWork}, 
+                 @{CandidateFieldNames.CreatedDate},
+                 @{CandidateFieldNames.UpdatedDate});
                 """,
                 connection
             );
 
+            candidate.Id = await GenerateIdentity();
+            command.Parameters.AddWithValue($"@{CandidateFieldNames.Id}", candidate.Id);
             command.Parameters.AddWithValue($"@{CandidateFieldNames.CreatedDate}", DateTime.Now);
             ParameteriseValuesForCommand(command, candidate);
-            ParameteriseValuesForCommand(command, candidate);
-
-            // Sets ID to db identity column
-            candidate.Id = (int)await command.ExecuteScalarAsync();
 
             return candidate;
         }
         catch (Exception ex)
         {
-            throw new Exception($"Error retrieving candidate: {ex.Message}", ex);
+            throw new Exception($"Error inserting candidate: {ex.Message}", ex);
         }
     }
 
@@ -368,5 +370,27 @@ public class CandidateRepository : ICandidateRepository
             candidate.PhoneWork
         );
         command.Parameters.AddWithValue($"@{CandidateFieldNames.UpdatedDate}", DateTime.Now);
+    }
+
+    // Private static method to generate Identity based on last highest ID in db
+    private static async Task<int> GenerateIdentity()
+    {
+        try
+        {
+            await using var connection = new SqlConnection(SqlConnectionHelper.ConnectionString);
+            connection.Open();
+
+            await using var command = new SqlCommand(
+                $"SELECT MAX({CandidateFieldNames.Id}) + 1 FROM [Candidate]",
+                connection
+            );
+
+            int identity = (int)await command.ExecuteScalarAsync();
+            return identity;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Error generating identity: {ex.Message}", ex);
+        }
     }
 }
