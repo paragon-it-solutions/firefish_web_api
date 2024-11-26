@@ -81,14 +81,14 @@ public class SkillRepository : ISkillRepository
         int skillId
     )
     {
+        if (await SkillExistsForCandidateAsync(skillId, candidateId))
+        {
+            throw new InvalidOperationException(
+                $"Skill with ID {skillId} already exists for candidate with ID {candidateId}"
+            );
+        }
         try
         {
-            if (await SkillExistsForCandidateAsync(skillId, candidateId))
-            {
-                throw new InvalidOperationException(
-                    $"Skill with ID {skillId} already exists for candidate with ID {candidateId}"
-                );
-            }
             await using var connection = new SqlConnection(SqlConnectionHelper.ConnectionString);
             await connection.OpenAsync();
 

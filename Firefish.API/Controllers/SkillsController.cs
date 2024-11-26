@@ -92,7 +92,7 @@ namespace Firefish.API.Controllers
                     statusCode: StatusCodes.Status404NotFound
                 );
             }
-            catch (ArgumentException ex)
+            catch (InvalidOperationException ex)
             {
                 return Problem(
                     title: "Invalid Input",

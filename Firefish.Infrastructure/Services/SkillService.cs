@@ -48,18 +48,15 @@ public class SkillService(ISkillRepository skillRepository) : ISkillService
     {
         try
         {
-            if (!await skillRepository.CandidateSkillExists(candidateSkill.SkillId))
-            {
-                throw new ArgumentException(
-                    $"Skill with ID {candidateSkill.SkillId} does not exist."
-                );
-            }
-
             var updatedSkills = await skillRepository.AddSkillByCandidateIdAsync(
                 candidateSkill.CandidateId,
                 candidateSkill.SkillId
             );
             return updatedSkills.Select(SkillMapper.MapToSkillResponseModel).ToList();
+        }
+        catch (InvalidOperationException)
+        {
+            throw;
         }
         catch (Exception ex)
         {
