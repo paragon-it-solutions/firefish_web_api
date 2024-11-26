@@ -18,7 +18,7 @@ public class CandidateService(ICandidateRepository candidateRepository) : ICandi
     ///     an IEnumerable of CandidateListItemResponseModel representing all candidates.
     /// </returns>
     /// <exception cref="Exception">Thrown when an error occurs while retrieving candidates.</exception>
-    public async Task<IEnumerable<CandidateListItemResponseModel>> GetAllCandidates()
+    public async Task<IEnumerable<CandidateListItemResponseModel>> GetAllCandidatesAsync()
     {
         try
         {
@@ -40,7 +40,7 @@ public class CandidateService(ICandidateRepository candidateRepository) : ICandi
     ///     a CandidateDetailsResponseModel representing the requested candidate.
     /// </returns>
     /// <exception cref="Exception">Thrown when the candidate is not found or an error occurs during retrieval.</exception>
-    public async Task<CandidateDetailsResponseModel> GetCandidateById(int candidateId)
+    public async Task<CandidateDetailsResponseModel> GetCandidateByIdAsync(int candidateId)
     {
         try
         {
@@ -48,7 +48,7 @@ public class CandidateService(ICandidateRepository candidateRepository) : ICandi
 
             if (candidate == null)
             {
-                throw new Exception("Candidate not found.");
+                throw new KeyNotFoundException("Candidate not found.");
             }
 
             return CandidateMapper.MapToCandidateDetailsResponse(candidate);
@@ -71,10 +71,15 @@ public class CandidateService(ICandidateRepository candidateRepository) : ICandi
     ///     a CandidateDetailsResponseModel representing the newly created candidate.
     /// </returns>
     /// <exception cref="Exception">Thrown when the candidate creation fails or an error occurs during the process.</exception>
-    public async Task<CandidateDetailsResponseModel> CreateCandidate(
+    public async Task<CandidateDetailsResponseModel> CreateCandidateAsync(
         CandidateModifyRequestModel candidateRequestModel
     )
     {
+        if (candidateRequestModel.FirstName == null || candidateRequestModel.Surname == null ||
+            candidateRequestModel.PhoneMobile == null)
+        {
+            throw new ArgumentException("All required fields must be provided.");
+        }
         try
         {
             Candidate candidate = CandidateMapper.MapToEntity(candidateRequestModel);
@@ -96,15 +101,33 @@ public class CandidateService(ICandidateRepository candidateRepository) : ICandi
     /// <summary>
     ///     Updates an existing candidate in the repository.
     /// </summary>
+    /// <param name="id">The ID of the candidate to be modified.</param>
     /// <param name="candidateRequestModel">The CandidateModifyRequestModel containing the updated data for the candidate.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
     /// <exception cref="Exception">Thrown when an error occurs during the update process.</exception>
-    public async Task UpdateExistingCandidate(CandidateModifyRequestModel candidateRequestModel)
+    public async Task<CandidateDetailsResponseModel> UpdateExistingCandidateAsync(int id,
+        CandidateModifyRequestModel candidateRequestModel
+    )
     {
         try
         {
+            if (candidateRequestModel.FirstName == null || candidateRequestModel.Surname == null ||
+                candidateRequestModel.PhoneMobile == null)
+            {
+                throw new ArgumentException("All required fields must be provided.");
+            }
+
+            
+            if (candidateRepository.CandidateExistsAsync(id) == null)
+            {
+                throw new KeyNotFoundException("Candidate not found.");
+            }
             Candidate candidate = CandidateMapper.MapToEntity(candidateRequestModel);
-            await candidateRepository.UpdateExistingCandidateAsync(candidate);
+            candidate.Id = id;
+            Candidate updatedCandidate = await candidateRepository.UpdateExistingCandidateAsync(
+                candidate
+            );
+            return CandidateMapper.MapToCandidateDetailsResponse(updatedCandidate);
         }
         catch (Exception ex)
         {
