@@ -7,7 +7,7 @@ using Firefish.Core.Models.Candidate.Responses;
 
 namespace Firefish.Infrastructure.Services;
 
-// Exception handling fairly barebones, should use logger. Eror handling will be handled better at Controller layer in API
+// Exception handling fairly barebones, should use logger. Error handling will be handled better at Controller layer in API.
 public class CandidateService(ICandidateRepository candidateRepository) : ICandidateService
 {
     /// <summary>
