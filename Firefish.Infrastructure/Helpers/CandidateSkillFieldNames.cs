@@ -17,5 +17,5 @@ public static class CandidateSkillFieldNames
     public const string CreatedDate = nameof(CandidateSkill.CreatedDate);
     public const string UpdatedDate = nameof(CandidateSkill.UpdatedDate);
     public const string SkillId = nameof(CandidateSkill.SkillId);
-    public const string SkillName = $"{nameof(Skill)}.{nameof(Skill.Name)}"; // SkillName is not a live field on DB - it is determined by the join between CandidateSkill and Skill tables.
+    public const string SkillName = $"{nameof(Skill)}{nameof(Skill.Name)}"; // SkillName is not a live field on DB - it is determined by the join between CandidateSkill and Skill tables.
 }
