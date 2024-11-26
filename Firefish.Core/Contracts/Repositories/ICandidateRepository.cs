@@ -9,5 +9,4 @@ public interface ICandidateRepository
     Task<Candidate> CreateCandidateAsync(Candidate candidate);
     Task<Candidate> UpdateExistingCandidateAsync(Candidate candidate);
     Task<bool> CandidateExistsAsync(int candidateId);
-
 }

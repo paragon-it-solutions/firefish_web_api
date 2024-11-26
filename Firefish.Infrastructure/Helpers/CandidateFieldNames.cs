@@ -8,7 +8,7 @@ namespace Firefish.Infrastructure.Helpers;
 /// <remarks>
 /// This static class contains string constants that match the property names of the Candidate class.
 /// These constants can be used for consistent property name references across the application, and
-/// to avoid "magic strings" in the code. 
+/// to avoid "magic strings" in the code.
 /// </remarks>
 public static class CandidateFieldNames
 {

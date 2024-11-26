@@ -65,24 +65,27 @@ public class CandidateService(ICandidateRepository candidateRepository) : ICandi
     /// <summary>
     ///     Creates a new candidate in the repository.
     /// </summary>
-    /// <param name="candidateRequestModel">The CandidateModifyRequestModel containing the data for the new candidate.</param>
+    /// <param name="candidateModel">The CandidateModifyRequestModel containing the data for the new candidate.</param>
     /// <returns>
     ///     A task that represents the asynchronous operation. The task result contains
     ///     a CandidateDetailsResponseModel representing the newly created candidate.
     /// </returns>
     /// <exception cref="Exception">Thrown when the candidate creation fails or an error occurs during the process.</exception>
     public async Task<CandidateDetailsResponseModel> CreateCandidateAsync(
-        CandidateModifyRequestModel candidateRequestModel
+        CandidateModifyRequestModel candidateModel
     )
     {
-        if (candidateRequestModel.FirstName == null || candidateRequestModel.Surname == null ||
-            candidateRequestModel.PhoneMobile == null)
+        if (
+            candidateModel.FirstName == null
+            || candidateModel.Surname == null
+            || candidateModel.PhoneMobile == null
+        )
         {
             throw new ArgumentException("All required fields must be provided.");
         }
         try
         {
-            Candidate candidate = CandidateMapper.MapToEntity(candidateRequestModel);
+            Candidate candidate = CandidateMapper.MapToEntity(candidateModel);
             Candidate createdCandidate = await candidateRepository.CreateCandidateAsync(candidate);
 
             if (createdCandidate == null || createdCandidate.Id == 0 || createdCandidate.Id == null)
@@ -101,29 +104,32 @@ public class CandidateService(ICandidateRepository candidateRepository) : ICandi
     /// <summary>
     ///     Updates an existing candidate in the repository.
     /// </summary>
-    /// <param name="id">The ID of the candidate to be modified.</param>
-    /// <param name="candidateRequestModel">The CandidateModifyRequestModel containing the updated data for the candidate.</param>
+    /// <param name="candidateId">The ID of the candidate to be modified.</param>
+    /// <param name="candidateModel">The CandidateModifyRequestModel containing the updated data for the candidate.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
     /// <exception cref="Exception">Thrown when an error occurs during the update process.</exception>
-    public async Task<CandidateDetailsResponseModel> UpdateExistingCandidateAsync(int id,
-        CandidateModifyRequestModel candidateRequestModel
+    public async Task<CandidateDetailsResponseModel> UpdateExistingCandidateAsync(
+        int candidateId,
+        CandidateModifyRequestModel candidateModel
     )
     {
         try
         {
-            if (candidateRequestModel.FirstName == null || candidateRequestModel.Surname == null ||
-                candidateRequestModel.PhoneMobile == null)
+            if (
+                candidateModel.FirstName == null
+                || candidateModel.Surname == null
+                || candidateModel.PhoneMobile == null
+            )
             {
                 throw new ArgumentException("All required fields must be provided.");
             }
 
-            
-            if (candidateRepository.CandidateExistsAsync(id) == null)
+            if (candidateRepository.CandidateExistsAsync(candidateId) == null)
             {
                 throw new KeyNotFoundException("Candidate not found.");
             }
-            Candidate candidate = CandidateMapper.MapToEntity(candidateRequestModel);
-            candidate.Id = id;
+            Candidate candidate = CandidateMapper.MapToEntity(candidateModel);
+            candidate.Id = candidateId;
             Candidate updatedCandidate = await candidateRepository.UpdateExistingCandidateAsync(
                 candidate
             );

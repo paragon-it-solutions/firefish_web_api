@@ -7,12 +7,14 @@ namespace Firefish.Infrastructure.Repositories;
 
 public class CandidateRepository : ICandidateRepository
 {
+    private const string CandidateTableName = nameof(Candidate);
+
     // Base query for retrieving all candidates from the database - can be modified to include additional filters or sorting as needed.
     private const string AllCandidateBaseQuery = $"""
         SELECT [{CandidateFieldNames.Id}], [{CandidateFieldNames.FirstName}], [{CandidateFieldNames.Surname}], [{CandidateFieldNames.DateOfBirth}],
         [{CandidateFieldNames.Address}], [{CandidateFieldNames.Town}], [{CandidateFieldNames.Country}], [{CandidateFieldNames.PostCode}], 
         [{CandidateFieldNames.PhoneHome}], [{CandidateFieldNames.PhoneMobile}], [{CandidateFieldNames.PhoneWork}], [{CandidateFieldNames.CreatedDate}],
-        [{CandidateFieldNames.UpdatedDate}] FROM [Candidate];
+        [{CandidateFieldNames.UpdatedDate}] FROM [{CandidateTableName}];
         """;
 
     /// <summary>
@@ -208,7 +210,7 @@ public class CandidateRepository : ICandidateRepository
 
             await using var command = new SqlCommand(
                 $"""
-                INSERT INTO [Candidate] 
+                INSERT INTO [{CandidateTableName}] 
                 ([{CandidateFieldNames.Id}],
                  [{CandidateFieldNames.FirstName}], 
                  [{CandidateFieldNames.Surname}], 
@@ -240,7 +242,7 @@ public class CandidateRepository : ICandidateRepository
                 connection
             );
 
-            candidate.Id = await GenerateIdentity();
+            candidate.Id = await SqlIdentityHelper.GenerateIdentity(CandidateTableName);
             command.Parameters.AddWithValue($"@{CandidateFieldNames.Id}", candidate.Id);
             command.Parameters.AddWithValue($"@{CandidateFieldNames.CreatedDate}", DateTime.Now);
             ParameteriseValuesForCommand(command, candidate);
@@ -274,7 +276,7 @@ public class CandidateRepository : ICandidateRepository
 
             await using var command = new SqlCommand(
                 $"""
-                            UPDATE [Candidate] 
+                            UPDATE [{CandidateTableName}] 
                             SET {CandidateFieldNames.FirstName} = @{CandidateFieldNames.FirstName}, 
                                 {CandidateFieldNames.Surname} = @{CandidateFieldNames.Surname}, 
                                 {CandidateFieldNames.DateOfBirth} = @{CandidateFieldNames.DateOfBirth}, 
@@ -329,7 +331,7 @@ public class CandidateRepository : ICandidateRepository
     }
 
     // Private static method to parameterise SQL command with candidate's value's - void as parameters collection will be modified on original reference object
-    // Note: Id and CreatedDate are not included here as they vary across update and create operations
+    // Note: Id and CreatedDate are not included here as they vary across implementation of update and create operations
     private static void ParameteriseValuesForCommand(SqlCommand command, Candidate candidate)
     {
         command.Parameters.AddWithNullableValue(
@@ -370,27 +372,5 @@ public class CandidateRepository : ICandidateRepository
             candidate.PhoneWork
         );
         command.Parameters.AddWithValue($"@{CandidateFieldNames.UpdatedDate}", DateTime.Now);
-    }
-
-    // Private static method to generate Identity based on last highest ID in db
-    private static async Task<int> GenerateIdentity()
-    {
-        try
-        {
-            await using var connection = new SqlConnection(SqlConnectionHelper.ConnectionString);
-            connection.Open();
-
-            await using var command = new SqlCommand(
-                $"SELECT MAX({CandidateFieldNames.Id}) + 1 FROM [Candidate]",
-                connection
-            );
-
-            int identity = (int)await command.ExecuteScalarAsync();
-            return identity;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"Error generating identity: {ex.Message}", ex);
-        }
     }
 }
