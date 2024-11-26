@@ -13,9 +13,11 @@ builder.Services.AddEndpointsApiExplorer();
 
 // Configure Repositories
 builder.Services.AddScoped<ICandidateRepository, CandidateRepository>();
+builder.Services.AddScoped<ISkillRepository, SkillRepository>();
 
 // Configure Services
 builder.Services.AddScoped<ICandidateService, CandidateService>();
+builder.Services.AddScoped<ISkillService, SkillService>();
 
 // CORS configuration
 builder.Services.AddCors(options =>
