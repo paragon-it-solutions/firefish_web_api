@@ -23,7 +23,7 @@ public class CandidateRepository : ICandidateRepository
     ///     This method establishes a database connection, executes a SELECT query to retrieve all candidates,
     ///     and constructs a List of Candidate objects from the retrieved data. It handles null values for optional fields.
     /// </remarks>
-    public async Task<List<Candidate>> GetAllCandidatesAsync()
+    public async Task<IEnumerable<Candidate>> GetAllCandidatesAsync()
     {
         var candidates = new List<Candidate>();
 

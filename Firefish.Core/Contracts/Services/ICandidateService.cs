@@ -5,8 +5,8 @@ namespace Firefish.Core.Contracts.Services;
 
 public interface ICandidateService
 {
-    Task<List<CandidateListItemResponseModel>> GetAllCandidates();
+    Task<IEnumerable<CandidateListItemResponseModel>> GetAllCandidates();
     Task<CandidateDetailsResponseModel> GetCandidateById(int candidateId);
-    Task<CandidateDetailsResponseModel> CreateCandidate(CandidateCreateOrUpdateRequestModel candidate);
-    Task UpdateExistingCandidate(CandidateCreateOrUpdateRequestModel candidate);
+    Task<CandidateDetailsResponseModel> CreateCandidate(CandidateModifyRequestModel candidate);
+    Task UpdateExistingCandidate(CandidateModifyRequestModel candidate);
 }
