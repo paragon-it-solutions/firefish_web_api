@@ -242,7 +242,7 @@ public class CandidateRepository : ICandidateRepository
                 connection
             );
 
-            candidate.Id = await SqlIdentityHelper.GenerateIdentity(CandidateTableName);
+            candidate.Id = await SqlIdentityHelper.GenerateIdentityAsync(CandidateTableName);
             command.Parameters.AddWithValue($"@{CandidateFieldNames.Id}", candidate.Id);
             command.Parameters.AddWithValue($"@{CandidateFieldNames.CreatedDate}", DateTime.Now);
             ParameteriseValuesForCommand(command, candidate);

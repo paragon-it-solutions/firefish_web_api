@@ -5,12 +5,12 @@ namespace Firefish.Infrastructure.Helpers;
 public class SqlIdentityHelper
 {
     // Static method to generate Identity based on last highest ID in db
-    public static async Task<int> GenerateIdentity(string table)
+    public static async Task<int> GenerateIdentityAsync(string table)
     {
         try
         {
             await using var connection = new SqlConnection(SqlConnectionHelper.ConnectionString);
-            connection.Open();
+            await connection.OpenAsync();
 
             await using var command = new SqlCommand(
                 $"SELECT MAX(ID) + 1 FROM [{table}]",
