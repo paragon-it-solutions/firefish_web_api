@@ -215,7 +215,7 @@ public class CandidateRepository : ICandidateRepository
     ///     This method opens a new SQL connection, constructs an UPDATE query using the provided candidate's information,
     ///     and executes it against the database. The UpdatedDate is automatically set to the current date and time.
     /// </remarks>
-    public async Task UpdateExistingCandidateAsync(Candidate candidate)
+    public async Task<Candidate> UpdateExistingCandidateAsync(Candidate candidate)
     {
         await using var connection = new SqlConnection(SqlConnectionHelper.ConnectionString);
         connection.Open();
@@ -244,6 +244,14 @@ public class CandidateRepository : ICandidateRepository
         ParameteriseValuesForCommand(command, candidate);
         
         await command.ExecuteNonQueryAsync();
+        
+        return candidate;
+    }
+
+    public async Task<bool> CandidateExistsAsync(int candidateId)
+    {
+        Candidate? candidate = await GetCandidateByIdAsync(candidateId);
+        return candidate != null;
     }
 
     // Private static method to parameterise SQL command with candidate's value's - void as parameters collection will be modified on original reference object

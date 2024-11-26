@@ -7,5 +7,7 @@ public interface ICandidateRepository
     Task<IEnumerable<Candidate>> GetAllCandidatesAsync();
     Task<Candidate?> GetCandidateByIdAsync(int candidateId);
     Task<Candidate> CreateCandidateAsync(Candidate candidate);
-    Task UpdateExistingCandidateAsync(Candidate candidate);
+    Task<Candidate> UpdateExistingCandidateAsync(Candidate candidate);
+    Task<bool> CandidateExistsAsync(int candidateId);
+
 }
