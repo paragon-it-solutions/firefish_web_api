@@ -36,7 +36,7 @@ public class CandidateRepository : ICandidateRepository
         try
         {
             await using var connection = new SqlConnection(SqlConnectionHelper.ConnectionString);
-            connection.Open();
+            await connection.OpenAsync();
 
             await using var command = new SqlCommand(AllCandidateBaseQuery, connection);
             await using SqlDataReader? reader = await command.ExecuteReaderAsync();
@@ -120,13 +120,13 @@ public class CandidateRepository : ICandidateRepository
         try
         {
             await using var connection = new SqlConnection(SqlConnectionHelper.ConnectionString);
-            connection.Open();
+            await connection.OpenAsync();
 
             await using var command = new SqlCommand(
                 $"{AllCandidateBaseQuery} WHERE {CandidateFieldNames.Id} = @{CandidateFieldNames.Id}",
                 connection
             );
-            command.Parameters.AddWithValue("@Id", candidateId);
+            command.Parameters.AddWithValue($"@{CandidateFieldNames.Id}", candidateId);
 
             await using SqlDataReader? reader = await command.ExecuteReaderAsync();
             if (reader.Read())
@@ -206,7 +206,7 @@ public class CandidateRepository : ICandidateRepository
         try
         {
             await using var connection = new SqlConnection(SqlConnectionHelper.ConnectionString);
-            connection.Open();
+            await connection.OpenAsync();
 
             await using var command = new SqlCommand(
                 $"""
@@ -272,7 +272,7 @@ public class CandidateRepository : ICandidateRepository
         try
         {
             await using var connection = new SqlConnection(SqlConnectionHelper.ConnectionString);
-            connection.Open();
+            await connection.OpenAsync();
 
             await using var command = new SqlCommand(
                 $"""
