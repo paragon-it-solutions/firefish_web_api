@@ -10,7 +10,7 @@ namespace Firefish.Infrastructure.Helpers;
 /// These constants can be used for consistent property name references across the application, and
 /// to avoid "magic strings" in the code.
 /// </remarks>
-public static class SkillFieldNames
+public static class CandidateSkillFieldNames
 {
     public const string Id = nameof(CandidateSkill.Id);
     public const string CandidateId = nameof(CandidateSkill.CandidateId);
