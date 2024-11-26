@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { teal } from '@mui/material/colors';
 import CssBaseline from '@mui/material/CssBaseline';
 import CandidatesList from './components/candidates/CandidatesList';
 import AddCandidate from './components/candidates/AddCandidate';
@@ -13,6 +14,10 @@ import EditCandidate from './components/candidates/EditCandidate';
 const darkTheme = createTheme({
   palette: {
     mode: 'dark',
+    primary: teal,
+    secondary: {
+      main: '#ff7043',
+    },    
   },
 });
 function App() {
