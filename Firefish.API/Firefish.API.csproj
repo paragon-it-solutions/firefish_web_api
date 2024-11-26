@@ -14,4 +14,8 @@
         <Folder Include="Controllers\"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Firefish.Infrastructure\Firefish.Infrastructure.csproj" />
+    </ItemGroup>
+
 </Project>
