@@ -2,7 +2,7 @@
 
 namespace Firefish.Infrastructure.Helpers;
 
-public class SqlIdentityHelper
+public static class SqlIdentityHelper
 {
     // Static method to generate Identity based on last highest ID in db
     public static async Task<int> GenerateIdentityAsync(string table)

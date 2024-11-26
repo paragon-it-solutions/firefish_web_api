@@ -26,4 +26,8 @@
       <ProjectReference Include="..\Firefish.Infrastructure\Firefish.Infrastructure.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="react-app\" />
+    </ItemGroup>
+
 </Project>
