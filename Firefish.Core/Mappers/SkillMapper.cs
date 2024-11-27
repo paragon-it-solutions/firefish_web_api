@@ -9,13 +9,15 @@ namespace Firefish.Core.Mappers;
 public static class SkillMapper
 {
     /// <summary>
-    ///     Maps a CandidateSkill entity to a SkillResponseModel.
+    ///     Maps a CandidateSkill entity to a CandidateSkillResponseModel.
     /// </summary>
     /// <param name="candidateSkill">The CandidateSkill entity to map from.</param>
-    /// <returns>A new SkillResponseModel.</returns>
-    public static SkillResponseModel MapToSkillResponseModel(CandidateSkill candidateSkill)
+    /// <returns>A new CandidateSkillResponseModel.</returns>
+    public static CandidateSkillResponseModel MapToCandidateSkillResponseModel(
+        CandidateSkill candidateSkill
+    )
     {
-        return new SkillResponseModel
+        return new CandidateSkillResponseModel
         {
             CandidateSkillId = candidateSkill.Id,
             SkillId = candidateSkill.SkillId,
@@ -24,10 +26,10 @@ public static class SkillMapper
     }
 
     /// <summary>
-    ///     Maps a Skill entity to a SkillResponseModel.
+    ///     Maps a Skill entity to a CandidateSkillResponseModel.
     /// </summary>
     /// <param name="skill">The SKill entity to map from.</param>
-    /// <returns>A new SkillResponseModel.</returns>
+    /// <returns>A new CandidateSkillResponseModel.</returns>
     public static SkillResponseModel MapToSkillResponseModel(Skill skill)
     {
         return new SkillResponseModel { SkillId = skill.Id, Name = skill.Name! };
