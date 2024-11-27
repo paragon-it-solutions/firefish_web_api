@@ -42,56 +42,7 @@ public class CandidateRepository : ICandidateRepository
             await using SqlDataReader? reader = await command.ExecuteReaderAsync();
             while (reader.Read())
             {
-                candidates.Add(
-                    new Candidate
-                    {
-                        Id = reader.GetInt32(reader.GetOrdinal(CandidateFieldNames.Id)),
-                        FirstName = reader.IsDBNull(
-                            reader.GetOrdinal(CandidateFieldNames.FirstName)
-                        )
-                            ? null
-                            : reader.GetString(reader.GetOrdinal(CandidateFieldNames.FirstName)),
-                        Surname = reader.IsDBNull(reader.GetOrdinal(CandidateFieldNames.Surname))
-                            ? null
-                            : reader.GetString(reader.GetOrdinal(CandidateFieldNames.Surname)),
-                        DateOfBirth = reader.GetDateTime(
-                            reader.GetOrdinal(CandidateFieldNames.DateOfBirth)
-                        ),
-                        Address = reader.IsDBNull(reader.GetOrdinal(CandidateFieldNames.Address))
-                            ? null
-                            : reader.GetString(reader.GetOrdinal(CandidateFieldNames.Address)),
-                        Town = reader.IsDBNull(reader.GetOrdinal(CandidateFieldNames.Town))
-                            ? null
-                            : reader.GetString(reader.GetOrdinal(CandidateFieldNames.Town)),
-                        Country = reader.IsDBNull(reader.GetOrdinal(CandidateFieldNames.Country))
-                            ? null
-                            : reader.GetString(reader.GetOrdinal(CandidateFieldNames.Country)),
-                        PostCode = reader.IsDBNull(reader.GetOrdinal(CandidateFieldNames.PostCode))
-                            ? null
-                            : reader.GetString(reader.GetOrdinal(CandidateFieldNames.PostCode)),
-                        PhoneHome = reader.IsDBNull(
-                            reader.GetOrdinal(CandidateFieldNames.PhoneHome)
-                        )
-                            ? null
-                            : reader.GetString(reader.GetOrdinal(CandidateFieldNames.PhoneHome)),
-                        PhoneMobile = reader.IsDBNull(
-                            reader.GetOrdinal(CandidateFieldNames.PhoneMobile)
-                        )
-                            ? null
-                            : reader.GetString(reader.GetOrdinal(CandidateFieldNames.PhoneMobile)),
-                        PhoneWork = reader.IsDBNull(
-                            reader.GetOrdinal(CandidateFieldNames.PhoneWork)
-                        )
-                            ? null
-                            : reader.GetString(reader.GetOrdinal(CandidateFieldNames.PhoneWork)),
-                        CreatedDate = reader.GetDateTime(
-                            reader.GetOrdinal(CandidateFieldNames.CreatedDate)
-                        ),
-                        UpdatedDate = reader.GetDateTime(
-                            reader.GetOrdinal(CandidateFieldNames.UpdatedDate)
-                        ),
-                    }
-                );
+                candidates.Add(MapCandidateFromReader(reader));
             }
         }
         catch (Exception ex)
@@ -129,53 +80,7 @@ public class CandidateRepository : ICandidateRepository
             command.Parameters.AddWithValue($"@{CandidateFieldNames.Id}", candidateId);
 
             await using SqlDataReader? reader = await command.ExecuteReaderAsync();
-            if (reader.Read())
-            {
-                return new Candidate
-                {
-                    Id = reader.GetInt32(reader.GetOrdinal(CandidateFieldNames.Id)),
-                    FirstName = reader.IsDBNull(reader.GetOrdinal(CandidateFieldNames.FirstName))
-                        ? null
-                        : reader.GetString(reader.GetOrdinal(CandidateFieldNames.FirstName)),
-                    Surname = reader.IsDBNull(reader.GetOrdinal(CandidateFieldNames.Surname))
-                        ? null
-                        : reader.GetString(reader.GetOrdinal(CandidateFieldNames.Surname)),
-                    DateOfBirth = reader.GetDateTime(
-                        reader.GetOrdinal(CandidateFieldNames.DateOfBirth)
-                    ),
-                    Address = reader.IsDBNull(reader.GetOrdinal(CandidateFieldNames.Address))
-                        ? null
-                        : reader.GetString(reader.GetOrdinal(CandidateFieldNames.Address)),
-                    Town = reader.IsDBNull(reader.GetOrdinal(CandidateFieldNames.Town))
-                        ? null
-                        : reader.GetString(reader.GetOrdinal(CandidateFieldNames.Town)),
-                    Country = reader.IsDBNull(reader.GetOrdinal(CandidateFieldNames.Country))
-                        ? null
-                        : reader.GetString(reader.GetOrdinal(CandidateFieldNames.Country)),
-                    PostCode = reader.IsDBNull(reader.GetOrdinal(CandidateFieldNames.PostCode))
-                        ? null
-                        : reader.GetString(reader.GetOrdinal(CandidateFieldNames.PostCode)),
-                    PhoneHome = reader.IsDBNull(reader.GetOrdinal(CandidateFieldNames.PhoneHome))
-                        ? null
-                        : reader.GetString(reader.GetOrdinal(CandidateFieldNames.PhoneHome)),
-                    PhoneMobile = reader.IsDBNull(
-                        reader.GetOrdinal(CandidateFieldNames.PhoneMobile)
-                    )
-                        ? null
-                        : reader.GetString(reader.GetOrdinal(CandidateFieldNames.PhoneMobile)),
-                    PhoneWork = reader.IsDBNull(reader.GetOrdinal(CandidateFieldNames.PhoneWork))
-                        ? null
-                        : reader.GetString(reader.GetOrdinal(CandidateFieldNames.PhoneWork)),
-                    CreatedDate = reader.GetDateTime(
-                        reader.GetOrdinal(CandidateFieldNames.CreatedDate)
-                    ),
-                    UpdatedDate = reader.GetDateTime(
-                        reader.GetOrdinal(CandidateFieldNames.UpdatedDate)
-                    ),
-                };
-            }
-
-            return null;
+            return reader.Read() ? MapCandidateFromReader(reader) : null;
         }
         catch (Exception ex)
         {
@@ -372,5 +277,27 @@ public class CandidateRepository : ICandidateRepository
             candidate.PhoneWork
         );
         command.Parameters.AddWithValue($"@{CandidateFieldNames.UpdatedDate}", DateTime.Now);
+    }
+
+    // New candidate from reader
+
+    private Candidate MapCandidateFromReader(SqlDataReader reader)
+    {
+        return new Candidate
+        {
+            Id = reader.GetInt32(reader.GetOrdinal(CandidateFieldNames.Id)),
+            FirstName = reader.GetNullableString(CandidateFieldNames.FirstName),
+            Surname = reader.GetNullableString(CandidateFieldNames.Surname),
+            DateOfBirth = reader.GetDateTime(reader.GetOrdinal(CandidateFieldNames.DateOfBirth)),
+            Address = reader.GetNullableString(CandidateFieldNames.Address),
+            Town = reader.GetNullableString(CandidateFieldNames.Town),
+            Country = reader.GetNullableString(CandidateFieldNames.Country),
+            PostCode = reader.GetNullableString(CandidateFieldNames.PostCode),
+            PhoneHome = reader.GetNullableString(CandidateFieldNames.PhoneHome),
+            PhoneMobile = reader.GetNullableString(CandidateFieldNames.PhoneMobile),
+            PhoneWork = reader.GetNullableString(CandidateFieldNames.PhoneWork),
+            CreatedDate = reader.GetDateTime(reader.GetOrdinal(CandidateFieldNames.CreatedDate)),
+            UpdatedDate = reader.GetDateTime(reader.GetOrdinal(CandidateFieldNames.UpdatedDate)),
+        };
     }
 }
