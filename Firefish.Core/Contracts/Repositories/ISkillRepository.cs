@@ -4,6 +4,7 @@ namespace Firefish.Core.Contracts.Repositories;
 
 public interface ISkillRepository
 {
+    Task<IEnumerable<Skill>> GetAllSkillsAsync();
     Task<IEnumerable<CandidateSkill>> GetSkillsByCandidateIdAsync(int candidateId);
     Task<IEnumerable<CandidateSkill>> AddSkillByCandidateIdAsync(int candidateId, int skillId);
     Task<IEnumerable<CandidateSkill>> RemoveSkillByIdAsync(int candidateSkillId);
