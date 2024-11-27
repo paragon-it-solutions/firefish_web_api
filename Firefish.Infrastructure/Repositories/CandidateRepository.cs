@@ -6,7 +6,7 @@ using Microsoft.Data.SqlClient;
 namespace Firefish.Infrastructure.Repositories;
 
 // TODO: Implement logging and custom error handling
-// TODO: Impelement retry in case of failure for resilliency
+// TODO: Implement retry in case of failure for resiliency and fault tolerance.
 // TODO: Implement caching if appropriate for the application's needs.'
 /// <summary>
 ///     Repository class for managing Candidate entities in the database.
