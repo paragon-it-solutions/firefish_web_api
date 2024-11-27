@@ -13,6 +13,45 @@ public class SkillRepository : ISkillRepository
     private const string SkillTableName = nameof(Skill);
     private const string CandidateSkillTableName = nameof(CandidateSkill);
 
+    public async Task<IEnumerable<Skill>> GetAllSkillsAsync()
+    {
+        var skills = new List<Skill>();
+
+        try
+        {
+            await using var connection = new SqlConnection(SqlConnectionHelper.ConnectionString);
+            await connection.OpenAsync();
+
+            // Query to join the skill and candidate-skill tables based on the candidate ID - note alias SkillName given to Skill.Name
+            const string query = $"""
+                                SELECT {SkillTableName}.{CandidateSkillFieldNames.Id}, {SkillTableName}.Name as {CandidateSkillFieldNames.SkillName}
+                                FROM {SkillTableName}
+                """;
+
+            await using var command = new SqlCommand(query, connection);
+
+            await using SqlDataReader? reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                skills.Add(
+                    new Skill
+                    {
+                        Id = reader.GetInt32(reader.GetOrdinal(CandidateSkillFieldNames.Id)),
+                        Name = reader.GetString(
+                            reader.GetOrdinal(CandidateSkillFieldNames.SkillName)
+                        ),
+                    }
+                );
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Error retrieving skills for candidate: {ex.Message}", ex);
+        }
+
+        return skills;
+    }
+
     /// <summary>
     ///     Retrieves all skills associated with a specific candidate.
     /// </summary>
@@ -87,6 +126,12 @@ public class SkillRepository : ISkillRepository
                 $"Skill with ID {skillId} already exists for candidate with ID {candidateId}"
             );
         }
+
+        if (!await SkillExists(skillId))
+        {
+            throw new InvalidOperationException($"Skill with ID {skillId} does not exist!");
+        }
+
         try
         {
             await using var connection = new SqlConnection(SqlConnectionHelper.ConnectionString);
@@ -96,7 +141,7 @@ public class SkillRepository : ISkillRepository
                                 INSERT INTO {CandidateSkillTableName} ({CandidateSkillFieldNames.Id}, {CandidateSkillFieldNames.CandidateId}, 
                                 {CandidateSkillFieldNames.CreatedDate}, {CandidateSkillFieldNames.UpdatedDate}, {CandidateSkillFieldNames.SkillId})
                                 VALUES (@{CandidateSkillFieldNames.Id}, @{CandidateSkillFieldNames.CandidateId}, 
-                                @{CandidateSkillFieldNames.CreatedDate}, @{CandidateSkillFieldNames.UpdatedDate}, @{CandidateSkillFieldNames.SkillId})
+                                @{CandidateSkillFieldNames.CreatedDate}, @{CandidateSkillFieldNames.UpdatedDate}, @{CandidateSkillFieldNames.SkillId});
                 """;
 
             await using var command = new SqlCommand(query, connection);
@@ -144,6 +189,7 @@ public class SkillRepository : ISkillRepository
             {
                 throw new ArgumentException("CandidateSkill ID must be a non-negative integer");
             }
+
             if (!await CandidateSkillExists(candidateSkillId))
             {
                 throw new KeyNotFoundException(
@@ -194,6 +240,30 @@ public class SkillRepository : ISkillRepository
 
             const string query = $"""
                 SELECT COUNT(1) FROM {CandidateSkillTableName}
+                WHERE {CandidateSkillFieldNames.Id} = @{CandidateSkillFieldNames.Id}
+                """;
+
+            await using var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue($"@{CandidateSkillFieldNames.Id}", skillId);
+
+            object? result = await command.ExecuteScalarAsync();
+            return Convert.ToInt32(result) > 0;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Error checking skill existence: {ex.Message}", ex);
+        }
+    }
+
+    public async Task<bool> SkillExists(int skillId)
+    {
+        try
+        {
+            await using var connection = new SqlConnection(SqlConnectionHelper.ConnectionString);
+            await connection.OpenAsync();
+
+            const string query = $"""
+                SELECT COUNT(1) FROM {SkillTableName}
                 WHERE {CandidateSkillFieldNames.Id} = @{CandidateSkillFieldNames.Id}
                 """;
 
