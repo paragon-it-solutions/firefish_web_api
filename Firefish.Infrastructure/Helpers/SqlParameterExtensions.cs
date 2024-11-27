@@ -14,7 +14,7 @@ public static class SqlParameterExtensions
     public static void AddWithNullableValue(
         this SqlParameterCollection parameters,
         string parameterName,
-        object value
+        object? value
     )
     {
         parameters.AddWithValue(parameterName, value ?? DBNull.Value);
