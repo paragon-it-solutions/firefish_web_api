@@ -5,6 +5,16 @@ using Microsoft.Data.SqlClient;
 
 namespace Firefish.Infrastructure.Repositories;
 
+// TODO: Implement logging and custom error handling
+// TODO: Impelement retry in case of failure for resilliency
+// TODO: Implement caching if appropriate for the application's needs.'
+/// <summary>
+///     Repository class for managing Candidate entities in the database.
+/// </summary>
+/// <remarks>
+///     This class provides methods for creating, retrieving, updating, and checking the existence of Candidate records.
+///     It implements the ICandidateRepository interface and uses SQL Server for data persistence.
+/// </remarks>
 public class CandidateRepository : ICandidateRepository
 {
     private const string CandidateTableName = nameof(Candidate);
@@ -279,7 +289,7 @@ public class CandidateRepository : ICandidateRepository
         command.Parameters.AddWithValue($"@{CandidateFieldNames.UpdatedDate}", DateTime.Now);
     }
 
-    // New candidate from reader
+    // Maps candidate from reader
 
     private Candidate MapCandidateFromReader(SqlDataReader reader)
     {
