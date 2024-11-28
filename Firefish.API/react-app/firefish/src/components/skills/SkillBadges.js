@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import { Chip } from '@mui/material';
-import axios from 'axios';
-import red from '@mui/material/colors/red';
+import React, { useState } from "react";
+import PropTypes from "prop-types";
+import { Chip } from "@mui/material";
+import axios from "axios";
+import red from "@mui/material/colors/red";
 
 // Custom Components
 import AlertDanger from "../shared/AlertDanger";
@@ -13,11 +13,13 @@ const SkillBadges = ({ skills, onSkillRemoved }) => {
 
   const removeSkillFromCandidate = async (candidateSkillId) => {
     try {
-      await axios.delete(`http://localhost:5191/api/skills/${candidateSkillId}`);
+      await axios.delete(
+        `http://localhost:5191/api/skills/${candidateSkillId}`,
+      );
       // Call the onSkillRemoved callback to update the parent component's state
       onSkillRemoved(candidateSkillId);
     } catch (error) {
-      console.error('Error removing skill:', error);
+      console.error("Error removing skill:", error);
       setAlertMessage("Failed to remove skill. Please try again.");
       setIsAlertOpen(true);
     }
@@ -29,20 +31,21 @@ const SkillBadges = ({ skills, onSkillRemoved }) => {
   };
   return (
     <>
-      {skills && skills.map((skill) => (
-        <Chip
-          key={skill.candidateSkillId}
-          label={skill.name}
-          onDelete={() => removeSkillFromCandidate(skill.candidateSkillId)}
-          sx={{
-            margin: '2px',
-            '&:hover': {
-              backgroundColor: red[500],
-              color: 'white', // Blue text on hover
-            },
-          }}
-        />
-      ))}
+      {skills &&
+        skills.map((skill) => (
+          <Chip
+            key={skill.candidateSkillId}
+            label={skill.name}
+            onDelete={() => removeSkillFromCandidate(skill.candidateSkillId)}
+            sx={{
+              margin: "2px",
+              "&:hover": {
+                backgroundColor: red[500],
+                color: "white", // Blue text on hover
+              },
+            }}
+          />
+        ))}
       <AlertDanger
         message={alertMessage}
         open={isAlertOpen}
@@ -57,11 +60,10 @@ SkillBadges.propTypes = {
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,
-    })
+    }),
   ).isRequired,
   candidateId: PropTypes.number.isRequired,
   onSkillRemoved: PropTypes.func,
 };
 
 export default SkillBadges;
-
