@@ -4,13 +4,14 @@ import axios from "axios";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
-import { CardActions, Button, ButtonGroup, Chip, Divider } from "@mui/material";
+import { CardActions, Button, ButtonGroup, Divider } from "@mui/material";
 import Box from "@mui/material/Box";
 import Fab from "@mui/material/Fab";
 import AddIcon from "@mui/icons-material/Add";
 
 // Custom Components
-import SkillBadges from '../skills/SkillBadges';
+import SkillBadges from "../skills/SkillBadges";
+import AddSkillModal from "../skills/AddSkillModal";
 import AlertDanger from "../shared/AlertDanger";
 
 const useCandidates = () => {
@@ -64,15 +65,22 @@ const useCandidates = () => {
     }
   };
 
-  return { candidates, skills, loading, error, fetchCandidateDetails };
+  return {
+    candidates,
+    skills,
+    setSkills,
+    loading,
+    error,
+    fetchCandidateDetails,
+  };
 };
 
 const Candidate = ({
   candidate,
   candidateDetails,
   skills,
-  index,
   onMoreDetails,
+  onSkillRemoved,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -141,11 +149,13 @@ const Candidate = ({
             </Typography>
             <Typography variant="h5">
               Post Code: {candidateDetails.postCode}
-            </Typography>{" "}
-            Phone (Home): {candidateDetails.phoneHome}
+            </Typography>
+            <Typography variant="h5">
+              Phone (Home): {candidateDetails.phoneHome}
+            </Typography>
             <Typography variant="h5">
               Phone (Mobile): {candidateDetails.phoneMobile}
-            </Typography>{" "}
+            </Typography>
             <Typography variant="h5">
               Phone (Work): {candidateDetails.phoneWork}
             </Typography>
@@ -154,8 +164,12 @@ const Candidate = ({
         <Typography variant="body2" sx={{ mt: 2, mb: 1 }}>
           Skills:
         </Typography>
-         // Calls custom component to render skill badges
-        <SkillBadges skills={skills[index]} candidateId={candidate.id} />
+        <SkillBadges
+          skills={skills}
+          candidateId={candidate.id}
+          candidateName={candidate.name}
+          onSkillRemoved={(skillId) => onSkillRemoved(candidate.id, skillId)}
+        />
       </CardContent>
       <Divider sx={{ bgcolor: "teal" }} />
       <CardActions
@@ -180,6 +194,7 @@ const Candidate = ({
                 : "More Details"}
           </Button>
           <Button>Edit Candidate</Button>
+          <AddSkillModal candidateId={candidate.id} candidateName={candidate.name} />
         </ButtonGroup>
         {error && (
           <Typography color="error" variant="body2">
@@ -215,14 +230,20 @@ Candidate.propTypes = {
     createdDate: PropTypes.string.isRequired,
     updatedDate: PropTypes.string.isRequired,
   }),
-  skills: PropTypes.object,
-  index: PropTypes.number,
+  skills: PropTypes.array.isRequired,
   onMoreDetails: PropTypes.func.isRequired,
+  onSkillRemoved: PropTypes.func.isRequired,
 };
 
 function CandidateList() {
-  const { candidates, skills, loading, error, fetchCandidateDetails } =
-    useCandidates();
+  const {
+    candidates,
+    skills,
+    setSkills,
+    loading,
+    error,
+    fetchCandidateDetails,
+  } = useCandidates();
   const [candidateDetails, setCandidateDetails] = useState({});
   const [alertMessage, setAlertMessage] = useState("");
   const [isAlertOpen, setIsAlertOpen] = useState(false);
@@ -239,6 +260,15 @@ function CandidateList() {
       setAlertMessage("Error fetching candidate details");
       setIsAlertOpen(true);
     }
+  };
+
+  const handleSkillRemoved = (candidateId, skillId) => {
+    setSkills((prevSkills) => ({
+      ...prevSkills,
+      [candidateId]: prevSkills[candidateId].filter(
+        (skill) => skill.candidateSkillId !== skillId,
+      ),
+    }));
   };
 
   const handleCloseAlert = () => {
@@ -266,14 +296,14 @@ function CandidateList() {
       >
         Candidate List
       </Typography>
-      {candidates.map((candidate, index) => (
+      {candidates.map((candidate) => (
         <Candidate
           key={candidate.id}
           candidate={candidate}
           candidateDetails={candidateDetails[candidate.id]}
-          skills={skills}
-          index={index}
+          skills={skills[candidate.id]}
           onMoreDetails={handleMoreDetails}
+          onSkillRemoved={handleSkillRemoved}
         />
       ))}
       <Box sx={{ position: "fixed", bottom: 16, right: 16 }}>
@@ -298,4 +328,3 @@ function CandidateList() {
 }
 
 export default CandidateList;
-
