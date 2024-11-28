@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Chip } from '@mui/material';
 import axios from 'axios';
+import red from '@mui/material/colors/red';
+
+// Custom Components
 import AlertDanger from "../shared/AlertDanger";
 
 const SkillBadges = ({ skills, onSkillRemoved }) => {
@@ -28,14 +31,14 @@ const SkillBadges = ({ skills, onSkillRemoved }) => {
     <>
       {skills && skills.map((skill) => (
         <Chip
-          key={skill.id}
+          key={skill.candidateSkillId}
           label={skill.name}
-          onDelete={() => removeSkillFromCandidate(skill.id)}
+          onDelete={() => removeSkillFromCandidate(skill.candidateSkillId)}
           sx={{
             margin: '2px',
             '&:hover': {
-              backgroundColor: '#e0e0e0', // Light grey background on hover
-              color: '#1976d2', // Blue text on hover
+              backgroundColor: red[500],
+              color: 'white', // Blue text on hover
             },
           }}
         />
@@ -56,7 +59,8 @@ SkillBadges.propTypes = {
       name: PropTypes.string.isRequired,
     })
   ).isRequired,
-  onSkillRemoved: PropTypes.func.isRequired,
+  candidateId: PropTypes.number.isRequired,
+  onSkillRemoved: PropTypes.func,
 };
 
 export default SkillBadges;
