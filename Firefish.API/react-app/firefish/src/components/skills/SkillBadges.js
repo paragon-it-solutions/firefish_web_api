@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Chip } from '@mui/material';
 import axios from 'axios';
-
-// Reusable skills component to render deletable skill badges for a candidate 
+import AlertDanger from "../shared/AlertDanger";
 
 const SkillBadges = ({ skills, onSkillRemoved }) => {
+  const [alertMessage, setAlertMessage] = useState("");
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+
   const removeSkillFromCandidate = async (candidateSkillId) => {
     try {
       await axios.delete(`http://localhost:5191/api/skills/${candidateSkillId}`);
@@ -13,21 +15,36 @@ const SkillBadges = ({ skills, onSkillRemoved }) => {
       onSkillRemoved(candidateSkillId);
     } catch (error) {
       console.error('Error removing skill:', error);
-      // You might want to add some error handling here, such as showing an error message to the user
+      setAlertMessage("Failed to remove skill. Please try again.");
+      setIsAlertOpen(true);
     }
+  };
+
+  const handleCloseAlert = () => {
+    setIsAlertOpen(false);
+    setAlertMessage("");
   };
   return (
     <>
       {skills && skills.map((skill) => (
         <Chip
-          variant="outlined"
-          color="primary"
-          key={skill.candidateSkillId}
+          key={skill.id}
           label={skill.name}
-          sx={{ m: 0.5 }}
-          onDelete={() => removeSkillFromCandidate(skill.candidateSkillId)}
+          onDelete={() => removeSkillFromCandidate(skill.id)}
+          sx={{
+            margin: '2px',
+            '&:hover': {
+              backgroundColor: '#e0e0e0', // Light grey background on hover
+              color: '#1976d2', // Blue text on hover
+            },
+          }}
         />
       ))}
+      <AlertDanger
+        message={alertMessage}
+        open={isAlertOpen}
+        onClose={handleCloseAlert}
+      />
     </>
   );
 };
@@ -35,8 +52,7 @@ const SkillBadges = ({ skills, onSkillRemoved }) => {
 SkillBadges.propTypes = {
   skills: PropTypes.arrayOf(
     PropTypes.shape({
-      candidateSkillId: PropTypes.number.isRequired,
-      skillId: PropTypes.number.isRequired,
+      id: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,
     })
   ).isRequired,
@@ -44,3 +60,4 @@ SkillBadges.propTypes = {
 };
 
 export default SkillBadges;
+
