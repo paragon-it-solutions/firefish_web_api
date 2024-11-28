@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Firefish.Core.Tests", "Fire
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Firefish.Infrastructure.Tests", "Firefish.Infrastructure.Tests\Firefish.Infrastructure.Tests.csproj", "{799CA71A-35F0-42E2-97FF-BBB92E8A3513}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Firefish.API.Tests", "Firefish.API.Tests\Firefish.API.Tests.csproj", "{9C457F7B-BF84-4D01-A2B0-04DEFD2247B5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{799CA71A-35F0-42E2-97FF-BBB92E8A3513}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{799CA71A-35F0-42E2-97FF-BBB92E8A3513}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{799CA71A-35F0-42E2-97FF-BBB92E8A3513}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C457F7B-BF84-4D01-A2B0-04DEFD2247B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C457F7B-BF84-4D01-A2B0-04DEFD2247B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C457F7B-BF84-4D01-A2B0-04DEFD2247B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C457F7B-BF84-4D01-A2B0-04DEFD2247B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
