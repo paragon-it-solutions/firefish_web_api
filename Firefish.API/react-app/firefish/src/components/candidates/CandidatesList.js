@@ -9,6 +9,10 @@ import Box from "@mui/material/Box";
 import Fab from "@mui/material/Fab";
 import AddIcon from "@mui/icons-material/Add";
 
+// Custom Components
+import SkillBadges from '../skills/SkillBadges';
+import AlertDanger from "../shared/AlertDanger";
+
 const useCandidates = () => {
   const [candidates, setCandidates] = useState([]);
   const [skills, setSkills] = useState({});
@@ -48,79 +52,208 @@ const useCandidates = () => {
     fetchCandidates();
   }, []);
 
-  return { candidates, skills, loading, error };
+  const fetchCandidateDetails = async (candidateId) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:5191/api/candidates/${candidateId}`,
+      );
+      return response.data;
+    } catch (err) {
+      console.error("Error fetching candidate details: ", err);
+      throw err;
+    }
+  };
+
+  return { candidates, skills, loading, error, fetchCandidateDetails };
 };
 
-const Candidate = ({ candidate, skills, index }) => (
-  <Card sx={{ minWidth: 275, mb: 2 }}>
-    <CardContent>
-      <Typography variant="h3" color="primary" component="div">
-        <Divider
-          sx={{
-            "&::before, &::after": {
-              border: "1px solid teal"
-            },
-          }}
-        >
-          {candidate.name}
-        </Divider>
-      </Typography>
-      <Typography sx={{ mb: 1.5 }} color="text.secondary">
-        Born: {new Date(candidate.dateOfBirth).toLocaleDateString()}
-      </Typography>
-      <Typography variant="body2">
-        Town: {candidate.town}
-        <br />
-        Phone: {candidate.phone}
-      </Typography>
-      <Typography variant="body2" sx={{ mt: 2 }}>
-        Skills:
-      </Typography>
-      {skills[index] &&
-        skills[index].map((skill) => (
-          <Chip
-            variant="outlined"
-            color="primary"
-            key={skill.id}
-            label={skill.name}
-            sx={{ m: 0.5 }}
-          />
-        ))}
-    </CardContent>
-    <Divider sx={{ bgcolor: "teal" }} />
-    <CardActions sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        '& > *': {
-          m: 1,
-        },
-      }}>
-      <ButtonGroup variant="outlined">
-        <Button>More Details</Button>
-        <Button>Edit Candidate</Button>
-      </ButtonGroup>
-    </CardActions>
-  </Card>
-);
+const Candidate = ({
+  candidate,
+  candidateDetails,
+  skills,
+  index,
+  onMoreDetails,
+}) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleMoreDetails = async () => {
+    if (candidateDetails) return; // Don't fetch if we already have details
+    setIsLoading(true);
+    setError(null);
+    try {
+      await onMoreDetails(candidate.id);
+    } catch (err) {
+      setError("Failed to fetch more details. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Card sx={{ minWidth: 275, mb: 2 }}>
+      <CardContent>
+        <Typography variant="h3" color="primary" component="div">
+          <Divider
+            sx={{
+              "&::before, &::after": {
+                border: "1px solid teal",
+              },
+            }}
+          >
+            {candidate.name}
+          </Divider>
+        </Typography>
+        {!candidateDetails ? (
+          // Basic candidate information
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              mt: 2,
+            }}
+          >
+            <Typography variant="h5">
+              Born: {new Date(candidate.dateOfBirth).toLocaleDateString()}
+            </Typography>
+            <Typography variant="h5">Town: {candidate.town}</Typography>
+            <Typography variant="h5">Phone: {candidate.phone}</Typography>
+          </Box>
+        ) : (
+          // Detailed candidate information
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              mt: 2,
+            }}
+          >
+            <Typography variant="h5">
+              Born:{" "}
+              {new Date(candidateDetails.dateOfBirth).toLocaleDateString()}
+            </Typography>
+            <Typography variant="h5">
+              Address: {candidateDetails.address}
+            </Typography>
+            <Typography variant="h5">Town: {candidateDetails.town}</Typography>
+            <Typography variant="h5">
+              Country: {candidateDetails.country}
+            </Typography>
+            <Typography variant="h5">
+              Post Code: {candidateDetails.postCode}
+            </Typography>{" "}
+            Phone (Home): {candidateDetails.phoneHome}
+            <Typography variant="h5">
+              Phone (Mobile): {candidateDetails.phoneMobile}
+            </Typography>{" "}
+            <Typography variant="h5">
+              Phone (Work): {candidateDetails.phoneWork}
+            </Typography>
+          </Box>
+        )}
+        <Typography variant="body2" sx={{ mt: 2, mb: 1 }}>
+          Skills:
+        </Typography>
+         // Calls custom component to render skill badges
+        <SkillBadges skills={skills[index]} candidateId={candidate.id} />
+      </CardContent>
+      <Divider sx={{ bgcolor: "teal" }} />
+      <CardActions
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          "& > *": {
+            m: 1,
+          },
+        }}
+      >
+        <ButtonGroup variant="outlined">
+          <Button
+            onClick={handleMoreDetails}
+            disabled={isLoading || !!candidateDetails}
+          >
+            {isLoading
+              ? "Loading..."
+              : candidateDetails
+                ? "Details Loaded"
+                : "More Details"}
+          </Button>
+          <Button>Edit Candidate</Button>
+        </ButtonGroup>
+        {error && (
+          <Typography color="error" variant="body2">
+            {error}
+          </Typography>
+        )}
+      </CardActions>
+    </Card>
+  );
+};
 
 Candidate.propTypes = {
+  // properties for base candidate object
   candidate: PropTypes.shape({
-    id: PropTypes.number,
+    id: PropTypes.number.isRequired,
     name: PropTypes.string,
     dateOfBirth: PropTypes.string,
     town: PropTypes.string,
     phone: PropTypes.string,
+  }).isRequired,
+  // properties for candidate details object
+  candidateDetails: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    name: PropTypes.string,
+    dateOfBirth: PropTypes.string,
+    address: PropTypes.string,
+    town: PropTypes.string,
+    country: PropTypes.string,
+    postCode: PropTypes.string,
+    phoneHome: PropTypes.string,
+    phoneMobile: PropTypes.string,
+    phoneWork: PropTypes.string,
+    createdDate: PropTypes.string.isRequired,
+    updatedDate: PropTypes.string.isRequired,
   }),
   skills: PropTypes.object,
   index: PropTypes.number,
+  onMoreDetails: PropTypes.func.isRequired,
 };
 
 function CandidateList() {
-  const { candidates, skills, loading, error } = useCandidates();
+  const { candidates, skills, loading, error, fetchCandidateDetails } =
+    useCandidates();
+  const [candidateDetails, setCandidateDetails] = useState({});
+  const [alertMessage, setAlertMessage] = useState("");
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+
+  const handleMoreDetails = async (candidateId) => {
+    try {
+      const details = await fetchCandidateDetails(candidateId);
+      setCandidateDetails((prevDetails) => ({
+        ...prevDetails,
+        [candidateId]: details,
+      }));
+    } catch (err) {
+      console.error("Error fetching candidate details: ", err);
+      setAlertMessage("Error fetching candidate details");
+      setIsAlertOpen(true);
+    }
+  };
+
+  const handleCloseAlert = () => {
+    setIsAlertOpen(false);
+    setAlertMessage("");
+  };
+
+  useEffect(() => {
+    if (error) {
+      setAlertMessage(error);
+      setIsAlertOpen(true);
+    }
+  }, [error]);
 
   if (loading) return <div>Loading...</div>;
-  if (error) return <div>{error}</div>;
 
   return (
     <div style={{ maxWidth: 900, margin: "16px auto", position: "relative" }}>
@@ -137,18 +270,32 @@ function CandidateList() {
         <Candidate
           key={candidate.id}
           candidate={candidate}
+          candidateDetails={candidateDetails[candidate.id]}
           skills={skills}
           index={index}
+          onMoreDetails={handleMoreDetails}
         />
       ))}
       <Box sx={{ position: "fixed", bottom: 16, right: 16 }}>
-        <Fab variant="extended" size="large" color="secondary" aria-label="add">
+        <Fab
+          href="/add"
+          variant="extended"
+          size="large"
+          color="secondary"
+          aria-label="add"
+        >
           New Candidate
           <AddIcon />
         </Fab>
       </Box>
+      <AlertDanger
+        message={alertMessage}
+        open={isAlertOpen}
+        onClose={handleCloseAlert}
+      />
     </div>
   );
 }
 
 export default CandidateList;
+
