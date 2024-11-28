@@ -24,7 +24,7 @@ public class CandidateRepository : ICandidateRepository
         SELECT [{CandidateFieldNames.Id}], [{CandidateFieldNames.FirstName}], [{CandidateFieldNames.Surname}], [{CandidateFieldNames.DateOfBirth}],
         [{CandidateFieldNames.Address}], [{CandidateFieldNames.Town}], [{CandidateFieldNames.Country}], [{CandidateFieldNames.PostCode}], 
         [{CandidateFieldNames.PhoneHome}], [{CandidateFieldNames.PhoneMobile}], [{CandidateFieldNames.PhoneWork}], [{CandidateFieldNames.CreatedDate}],
-        [{CandidateFieldNames.UpdatedDate}] FROM [{CandidateTableName}];
+        [{CandidateFieldNames.UpdatedDate}] FROM [{CandidateTableName}]
         """;
 
     /// <summary>
@@ -48,6 +48,7 @@ public class CandidateRepository : ICandidateRepository
             await using var connection = new SqlConnection(SqlConnectionHelper.ConnectionString);
             await connection.OpenAsync();
 
+            // Ordered by created date in descending order so newest candidates are at the top.
             await using var command = new SqlCommand(AllCandidateBaseQuery, connection);
             await using SqlDataReader? reader = await command.ExecuteReaderAsync();
             while (reader.Read())
@@ -161,6 +162,8 @@ public class CandidateRepository : ICandidateRepository
             command.Parameters.AddWithValue($"@{CandidateFieldNames.Id}", candidate.Id);
             command.Parameters.AddWithValue($"@{CandidateFieldNames.CreatedDate}", DateTime.Now);
             ParameteriseValuesForCommand(command, candidate);
+
+            await command.ExecuteNonQueryAsync();
 
             return candidate;
         }
