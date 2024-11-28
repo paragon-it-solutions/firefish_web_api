@@ -193,7 +193,7 @@ const Candidate = ({
                 ? "Details Loaded"
                 : "More Details"}
           </Button>
-          <Button>Edit Candidate</Button>
+          <Button href={`/edit/${candidate.id}`}>Edit Candidate</Button>
           <AddSkillModal candidateId={candidate.id} candidateName={candidate.name} />
         </ButtonGroup>
         {error && (
