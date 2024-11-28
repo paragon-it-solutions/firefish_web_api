@@ -26,6 +26,7 @@ public class SkillRepository : ISkillRepository
             const string query = $"""
                                 SELECT {SkillTableName}.{CandidateSkillFieldNames.Id}, {SkillTableName}.Name as {CandidateSkillFieldNames.SkillName}
                                 FROM {SkillTableName}
+                                ORDER BY {SkillTableName}.{CandidateSkillFieldNames.Id} asc
                 """;
 
             await using var command = new SqlCommand(query, connection);
