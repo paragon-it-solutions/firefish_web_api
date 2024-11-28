@@ -110,18 +110,14 @@ public class SkillsController(ISkillService skillService) : ControllerBase
     /// <response code="404">If the candidate is not found</response>
     /// <response code="500">If there was an internal server error during skill creation</response>
     [HttpPost]
-    public async Task<ActionResult<CandidateSkillResponseModel>> Post(
+    public async Task<ActionResult<IEnumerable<CandidateSkillResponseModel>>> Post(
         [FromBody] CandidateSkillRequestModel candidateSkillModel
     )
     {
         try
         {
             var addedSkill = await skillService.AddSkillByCandidateIdAsync(candidateSkillModel);
-            return CreatedAtAction(
-                nameof(Get),
-                new { candidateId = addedSkill.First().SkillId },
-                addedSkill
-            );
+            return Ok(addedSkill);
         }
         catch (KeyNotFoundException ex)
         {
