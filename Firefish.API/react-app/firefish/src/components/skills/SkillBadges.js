@@ -6,6 +6,7 @@ import red from "@mui/material/colors/red";
 
 // Custom Components
 import AlertDanger from "../shared/AlertDanger";
+import apiBase from "../shared/ApiConfig";
 
 const SkillBadges = ({ skills, onSkillRemoved }) => {
   const [alertMessage, setAlertMessage] = useState("");
@@ -14,7 +15,7 @@ const SkillBadges = ({ skills, onSkillRemoved }) => {
   const removeSkillFromCandidate = async (candidateSkillId) => {
     try {
       await axios.delete(
-        `http://localhost:5191/api/skills/${candidateSkillId}`,
+        `${apiBase}/skills/${candidateSkillId}`,
       );
       // Call the onSkillRemoved callback to update the parent component's state
       onSkillRemoved(candidateSkillId);

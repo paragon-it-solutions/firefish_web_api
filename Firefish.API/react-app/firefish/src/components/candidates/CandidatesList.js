@@ -13,6 +13,7 @@ import AddIcon from "@mui/icons-material/Add";
 import SkillBadges from "../skills/SkillBadges";
 import AddSkillModal from "../skills/AddSkillModal";
 import AlertDanger from "../shared/AlertDanger";
+import apiBase from '../shared/ApiConfig';
 
 const useCandidates = () => {
   const [candidates, setCandidates] = useState([]);
@@ -24,14 +25,14 @@ const useCandidates = () => {
     const fetchCandidates = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5191/api/candidates",
+          `${apiBase}/candidates`,
         );
         setCandidates(response.data);
 
         // Fetch skills for each candidate
         const skillsPromises = response.data.map((candidate) =>
           axios.get(
-            `http://localhost:5191/api/skills/candidate/${candidate.id}`,
+            `${apiBase}/skills/candidate/${candidate.id}`,
           ),
         );
 
@@ -56,7 +57,7 @@ const useCandidates = () => {
   const fetchCandidateDetails = async (candidateId) => {
     try {
       const response = await axios.get(
-        `http://localhost:5191/api/candidates/${candidateId}`,
+        `${apiBase}/candidates/${candidateId}`,
       );
       return response.data;
     } catch (err) {

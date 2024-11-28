@@ -14,6 +14,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import axios from "axios";
+import apiBase from "../shared/ApiConfig";
 
 const style = {
   position: "absolute",
@@ -56,7 +57,7 @@ export default function AddSkillModal({ candidateId, candidateName }) {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get("http://localhost:5191/api/skills");
+      const response = await axios.get(`${apiBase}/skills`);
       setSkills(response.data);
     } catch (err) {
       console.error("Error fetching skills:", err);
@@ -79,7 +80,7 @@ export default function AddSkillModal({ candidateId, candidateName }) {
     setLoading(true);
     setError(null);
     try {
-      await axios.post("http://localhost:5191/api/skills", {
+      await axios.post(`${apiBase}/skills`, {
         candidateId: candidateId,
         skillId: selectedSkill,
       });

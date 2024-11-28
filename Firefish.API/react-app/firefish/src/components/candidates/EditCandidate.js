@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { TextField, Button, ButtonGroup, Box, Typography, CircularProgress } from "@mui/material";
+import {
+  TextField,
+  Button,
+  ButtonGroup,
+  Box,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+
+import apiBase from '../shared/ApiConfig';
 
 const EditCandidateForm = () => {
   const { candidateId } = useParams();
@@ -26,7 +35,9 @@ const EditCandidateForm = () => {
   useEffect(() => {
     const fetchCandidateData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5191/api/candidates/${candidateId}`);
+        const response = await axios.get(
+          `${apiBase}/candidates/${candidateId}`,
+        );
         const candidateData = response.data;
         const [firstName, ...surnameArray] = candidateData.name.split(" ");
         const surname = surnameArray.join(" ");
@@ -34,7 +45,9 @@ const EditCandidateForm = () => {
           ...candidateData,
           firstName,
           surname,
-          dateOfBirth: new Date(candidateData.dateOfBirth).toISOString().split('T')[0],
+          dateOfBirth: new Date(candidateData.dateOfBirth)
+            .toISOString()
+            .split("T")[0],
         });
         setLoading(false);
       } catch (err) {
@@ -57,7 +70,7 @@ const EditCandidateForm = () => {
     setSuccess("");
 
     try {
-      await axios.put(`http://localhost:5191/api/candidates/${candidateId}`, {
+      await axios.put(`${apiBase}/candidates/${candidateId}`, {
         ...formData,
         name: `${formData.firstName} ${formData.surname}`,
         dateOfBirth: new Date(formData.dateOfBirth).toISOString(),
